@@ -5,6 +5,7 @@ import {
   TextField,
   Typography,
   makeStyles,
+  IconButton,
 } from "@material-ui/core";
 
 import { Delete, PlusOneSharp, Save } from "@material-ui/icons";
@@ -14,6 +15,7 @@ import Paper from "@mui/material/Paper";
 
 import { styled } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
+import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -248,38 +250,35 @@ export default function AddStockForm() {
                     variant="outlined"
                     fullWidth
                     className={classes.textField}
-                    inputProps={{ type: "number" }}
-                    label={`Add last ${id} Year Dividend`}
+                    label={`Add last ${id} of 5 Year Dividend`}
                     name="bookValue"
                     value={value}
                     onChange={(e) => handleDevidendChange(id, e.target.value)}
                   />
-                  <Stack direction="row" spacing={1}>
-                    <LoadingButton
-                      className={classes.button}
-                      onClick={() => handleRemoveInput(id)}
-                      endIcon={<Delete />}
-                      loading={loading}
-                      loadingPosition="end"
-                      variant="contained"
-                      color="error"
-                    >
-                      <span>Remove</span>
-                    </LoadingButton>
-                  </Stack>
+
+                  <IconButton
+                    className={classes.button}
+                    onClick={() => handleRemoveInput(id)}
+                    loadingPosition="end"
+                    variant="contained"
+                    color="error"
+                  >
+                    <Delete color="error" />
+                  </IconButton>
                 </Item>
               </Stack>
             ))}
-            <LoadingButton
+            <IconButton
               className={`${classes.button}`}
               onClick={handleAddInput}
               endIcon={<PlusOneSharp />}
               loading={loading}
               loadingPosition="end"
               variant="contained"
+              color="primary"
             >
-              <span>Add</span>
-            </LoadingButton>
+              <AddCircleOutlineOutlined />
+            </IconButton>
           </Grid>
 
           <Grid item xs={6}>

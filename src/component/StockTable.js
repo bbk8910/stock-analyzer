@@ -1,63 +1,67 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+} from "@material-ui/core";
+import { Edit, Delete } from "@material-ui/icons";
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
+const MyTable = () => {
+  const rows = [
+    { id: 1, name: "John Doe", age: 30 },
+    { id: 2, name: "Jane Smith", age: 25 },
+    { id: 3, name: "Bob Johnson", age: 40 },
+  ];
 
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
-export default function StockTable(props) {
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+      <Table aria-label="a dense table" size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>Sector</TableCell>
+            <TableCell>EPS</TableCell>
+            <TableCell>P/E</TableCell>
+            <TableCell>PB</TableCell>
+            <TableCell>Book Value</TableCell>
+            <TableCell>PEG</TableCell>
+            <TableCell>ROE</TableCell>
+            <TableCell>ROA</TableCell>
+            <TableCell>Graham Number</TableCell>
+            <TableCell>Paid Up Capital</TableCell>
+            <TableCell>Debt to equity</TableCell>
+            <TableCell>YOY Growth</TableCell>
+            <TableCell>Payout raio(%)</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
+            <TableRow key={row.id}>
               <TableCell component="th" scope="row">
-                {row.name}
+                {row.id}
               </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
+              <TableCell>{row.age}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
-}
+};
+
+export default MyTable;
