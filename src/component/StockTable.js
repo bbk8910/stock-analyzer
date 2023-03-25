@@ -34,8 +34,9 @@ const MyTable = () => {
             <TableCell>Graham Number</TableCell>
             <TableCell>Paid Up Capital</TableCell>
             <TableCell>Debt to equity</TableCell>
-            <TableCell>YOY Growth</TableCell>
+            <TableCell>YOY Growth(%)</TableCell>
             <TableCell>Payout raio(%)</TableCell>
+            <TableCell>LTP</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -45,6 +46,7 @@ const MyTable = () => {
                 {row.id}
               </TableCell>
               <TableCell>{row.name}</TableCell>
+              <TableCell>{row.age}</TableCell>
               <TableCell>{row.age}</TableCell>
               <TableCell>{row.age}</TableCell>
               <TableCell>{row.age}</TableCell>

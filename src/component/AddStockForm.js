@@ -16,6 +16,17 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
+import {
+  getAnnualizedROA,
+  getAnnualizedROE,
+  getBookValue,
+  getDebtToEquity,
+  getEps,
+  getGN,
+  getPB,
+  getPEG,
+  getPERatio,
+} from "./FundamentalCalculator";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,12 +56,17 @@ export default function AddStockForm() {
     sector: "",
     symbol: "",
     outstandingShare: "",
-    marketPrice: "",
+    lastYearOutstandngShare: "",
+    currentPrice: "",
     purchasePrice: "",
     profit: "",
-    bookValue: "",
+    lastYearProfit: "",
+
     mktCapitalization: "",
     paidUpCapital: "",
+    totalAssets: "",
+    totalLiabilities: "",
+    totalDebt: "",
     deividendHistory: new Map(),
   });
   const {
@@ -85,8 +101,43 @@ export default function AddStockForm() {
     register(name, { required: true, value });
   };
 
-  const saveData = (event) => {
+  const saveData = (data) => {
+    console.log("Saveing data is loook like", data);
     setLoading(true);
+    const bookValue = getBookValue(data.totalAssets, data.totalLiabilities);
+    const eps = getEps(data?.outstandingShare, data?.profit);
+    const pe = getPERatio(data.currentPrice, eps);
+
+    const peg = getPEG(
+      pe,
+      eps - getEps(data.lastYearOutstandngShare, data.lastYearProfit)
+    );
+
+    const pb = getPB(data.currentPrice, bookValue);
+    const roe = getAnnualizedROE(data.profit, data.outstandingShare);
+    const roa = getAnnualizedROA(data.profit, data.totalAssets);
+    const gn = getGN(eps, bookValue);
+    const paidUpCapital = "";
+    const debtToEquity = getDebtToEquity(data.totalDebt, data.outstandingShare);
+    const yearToYearGrowth =
+      ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
+
+    const payoutRatio = "";
+
+    formData.bookValue = bookValue;
+    formData.eps = eps;
+    formData.pe = pe;
+    formData.peg = peg;
+    formData.pb = pb;
+    formData.roe = roe;
+    formData.roa = roa;
+    formData.gn = gn;
+    formData.paidUpCapital = paidUpCapital;
+    formData.debtToEquity = debtToEquity;
+    formData.yearToYearGrowth = yearToYearGrowth;
+    formData.payoutRatio = payoutRatio;
+
+    console.log("final form data--", formData);
   };
 
   const handleOptionChange = (name) => (event, value) => {
@@ -167,6 +218,26 @@ export default function AddStockForm() {
               }
             />
           </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="formatted-numberformat-input"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Last Year Outstanding Share"
+              name="lastYearOutstandngShare"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("lastYearOutstandngShare", { required: true })}
+              error={errors.lastYearOutstandngShare ? true : false}
+              helperText={
+                errors.lastYearOutstandngShare?.type === "required" &&
+                "Last year Outstanding is required"
+              }
+            />
+          </Grid>
+
           <Grid item xs={12} sm={6}>
             <TextField
               id="bh"
@@ -174,18 +245,38 @@ export default function AddStockForm() {
               fullWidth
               className={classes.textField}
               label="Current price"
-              name="marketPrice"
+              name="currentPrice"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
-              {...register("marketPrice", { required: true })}
-              error={errors.marketPrice ? true : false}
+              {...register("currentPrice", { required: true })}
+              error={errors.currentPrice ? true : false}
               helperText={
-                errors.marketPrice?.type === "required" && "Current is required"
+                errors.currentPrice?.type === "required" &&
+                "Current is required"
               }
             />
           </Grid>
 
           <Grid item xs={12} sm={6}>
+            <TextField
+              id="bh"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Last Year price"
+              name="lastPrice"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("lastPrice", { required: true })}
+              error={errors.lastPrice ? true : false}
+              helperText={
+                errors.lastPrice?.type === "required" &&
+                "Last year price is required"
+              }
+            />
+          </Grid>
+
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               id="formatted-numberformat-input"
               variant="outlined"
@@ -202,7 +293,7 @@ export default function AddStockForm() {
                 "Symbol is required"
               }
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} sm={6}>
             <TextField
               id="bh"
@@ -228,15 +319,88 @@ export default function AddStockForm() {
               variant="outlined"
               fullWidth
               className={classes.textField}
-              label="Book Value"
-              name="bookValue"
+              label="Profit"
+              name="profit"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
-              {...register("bookValue", { required: true })}
-              error={errors.bookValue ? true : false}
+              {...register("profit", { required: true })}
+              error={errors.profit ? true : false}
               helperText={
-                errors.bookValue?.type === "required" &&
-                "Book value is required"
+                errors.profit?.type === "required" && "Profit value is required"
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="formatted-numberformat-input"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Last year Profit"
+              name="lastYearProfit"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("lastYearProfit", { required: true })}
+              error={errors.lastYearProfit ? true : false}
+              helperText={
+                errors.lastYearProfit?.type === "required" &&
+                "Last year Profit value is required"
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="formatted-numberformat-input"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Total Assets"
+              name="totalAssets"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("profit", { required: true })}
+              error={errors.profit ? true : false}
+              helperText={
+                errors.profit?.type === "required" && "Profit value is required"
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="formatted-numberformat-input"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Total Liabilites"
+              name="profit"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("profit", { required: true })}
+              error={errors.profit ? true : false}
+              helperText={
+                errors.profit?.type === "required" && "Profit value is required"
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="formatted-numberformat-input"
+              variant="outlined"
+              fullWidth
+              className={classes.textField}
+              label="Total Debt"
+              name="totalDebt"
+              inputProps={{ type: "number" }}
+              onChange={handleInputChange}
+              {...register("totalDebt", { required: true })}
+              error={errors.totalDebt ? true : false}
+              helperText={
+                errors.totalDebt?.type === "required" &&
+                "Total Debt value is required"
               }
             />
           </Grid>
