@@ -13,6 +13,7 @@ import { Stack } from "@mui/material";
 import Paper from "@mui/material/Paper";
 
 import { styled } from "@mui/material/styles";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,21 +39,30 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function AddStockForm() {
-  const classes = useStyles();
-
-  const [loading, setLoading] = React.useState(false);
   const [formData, setFormData] = React.useState({
     sector: "",
     symbol: "",
-    outstandingShare: 0,
-    marketPrice: 0,
-    purchasePrice: 0,
-    profit: 0,
-    bookValue: 0,
-    mktCapitalization: 0,
-    paidUpCapital: 0,
+    outstandingShare: "",
+    marketPrice: "",
+    purchasePrice: "",
+    profit: "",
+    bookValue: "",
+    mktCapitalization: "",
+    paidUpCapital: "",
     deividendHistory: new Map(),
   });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: formData,
+  });
+
+  const classes = useStyles();
+
+  const [loading, setLoading] = React.useState(false);
+
   const [yearlyDividend, setYearlyDividend] = React.useState(
     new Map().set(1, "")
   );
@@ -63,12 +73,17 @@ export default function AddStockForm() {
 
   function getConsultant() {}
 
+  // const handleInputChange = (event) => {
+  //   const { name, value } = event.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    register(name, { required: true, value });
   };
 
-  const handleSave = (event) => {
+  const saveData = (event) => {
     setLoading(true);
   };
 
@@ -97,7 +112,7 @@ export default function AddStockForm() {
       <Typography variant="h4" component="h1" className={classes.title}>
         Add Stock
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(saveData)}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -107,8 +122,12 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Sector"
               name="sector"
-              value={""}
               onChange={handleInputChange}
+              {...register("sector", { required: true })}
+              error={errors.sector ? true : false}
+              helperText={
+                errors.sector?.type === "required" && "Sector is required"
+              }
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -119,8 +138,12 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Symbol"
               name="symbol"
-              value={""}
               onChange={handleInputChange}
+              {...register("symbol", { required: true })}
+              error={errors.symbol ? true : false}
+              helperText={
+                errors.symbol?.type === "required" && "Symbol is required"
+              }
             />
           </Grid>
 
@@ -132,8 +155,14 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Outstanding Share"
               name="outstandingShare"
-              value={""}
+              inputProps={{ type: "number" }}
               onChange={handleInputChange}
+              {...register("outstandingShare", { required: true })}
+              error={errors.outstandingShare ? true : false}
+              helperText={
+                errors.outstandingShare?.type === "required" &&
+                "Outstanding is required"
+              }
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -144,8 +173,13 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Current price"
               name="marketPrice"
-              value={""}
+              inputProps={{ type: "number" }}
               onChange={handleInputChange}
+              {...register("marketPrice", { required: true })}
+              error={errors.marketPrice ? true : false}
+              helperText={
+                errors.marketPrice?.type === "required" && "Current is required"
+              }
             />
           </Grid>
 
@@ -157,8 +191,14 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Purchase Price"
               name="purchasePrice"
-              value={""}
+              inputProps={{ type: "number" }}
               onChange={handleInputChange}
+              {...register("purchasePrice", { required: true })}
+              error={errors.purchasePrice ? true : false}
+              helperText={
+                errors.purchasePrice?.type === "required" &&
+                "Symbol is required"
+              }
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -169,8 +209,14 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Market Capitalization"
               name="mktCapitalization"
-              value={""}
+              inputProps={{ type: "number" }}
               onChange={handleInputChange}
+              {...register("mktCapitalization", { required: true })}
+              error={errors.mktCapitalization ? true : false}
+              helperText={
+                errors.mktCapitalization?.type === "required" &&
+                "This field is required"
+              }
             />
           </Grid>
 
@@ -182,10 +228,17 @@ export default function AddStockForm() {
               className={classes.textField}
               label="Book Value"
               name="bookValue"
-              value={""}
+              inputProps={{ type: "number" }}
               onChange={handleInputChange}
+              {...register("bookValue", { required: true })}
+              error={errors.bookValue ? true : false}
+              helperText={
+                errors.bookValue?.type === "required" &&
+                "Book value is required"
+              }
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
             {Array.from(yearlyDividend, ([id, value]) => (
               <Stack spacing={1}>
@@ -195,6 +248,7 @@ export default function AddStockForm() {
                     variant="outlined"
                     fullWidth
                     className={classes.textField}
+                    inputProps={{ type: "number" }}
                     label={`Add last ${id} Year Dividend`}
                     name="bookValue"
                     value={value}
@@ -228,13 +282,13 @@ export default function AddStockForm() {
             </LoadingButton>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <Stack direction="row" spacing={1}>
               <LoadingButton
                 className={classes.button}
                 onClick={null}
                 endIcon={<Save />}
-                loading={loading}
+                loading={false}
                 loadingPosition="end"
                 variant="contained"
                 type="submit"
