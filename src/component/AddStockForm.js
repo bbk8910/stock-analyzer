@@ -6,6 +6,7 @@ import {
   Typography,
   makeStyles,
   IconButton,
+  Box,
 } from "@material-ui/core";
 
 import { Delete, PlusOneSharp, Save } from "@material-ui/icons";
@@ -27,6 +28,7 @@ import {
   getPEG,
   getPERatio,
 } from "./FundamentalCalculator";
+import { save } from "./Dao";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,14 +43,9 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginRight: theme.spacing(2),
   },
-}));
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
+  item: {
+    padding: theme.spacing(2),
+  },
 }));
 
 export default function AddStockForm() {
@@ -138,6 +135,7 @@ export default function AddStockForm() {
     formData.payoutRatio = payoutRatio;
 
     console.log("final form data--", formData);
+    save(formData);
   };
 
   const handleOptionChange = (name) => (event, value) => {
@@ -161,7 +159,7 @@ export default function AddStockForm() {
   };
 
   return (
-    <div className={classes.root}>
+    <Box className={classes.root}>
       <Typography variant="h4" component="h1" className={classes.title}>
         Add Stock
       </Typography>
@@ -360,10 +358,11 @@ export default function AddStockForm() {
               name="totalAssets"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
-              {...register("profit", { required: true })}
-              error={errors.profit ? true : false}
+              {...register("totalAssets", { required: true })}
+              error={errors.totalAssets ? true : false}
               helperText={
-                errors.profit?.type === "required" && "Profit value is required"
+                errors.totalAssets?.type === "required" &&
+                "Total Assets value is required"
               }
             />
           </Grid>
@@ -375,13 +374,14 @@ export default function AddStockForm() {
               fullWidth
               className={classes.textField}
               label="Total Liabilites"
-              name="profit"
+              name="totalLiabilities"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
-              {...register("profit", { required: true })}
-              error={errors.profit ? true : false}
+              {...register("totalLiabilities", { required: true })}
+              error={errors.totalLiabilities ? true : false}
               helperText={
-                errors.profit?.type === "required" && "Profit value is required"
+                errors.totalLiabilities?.type === "required" &&
+                "Total Liabilites value is required"
               }
             />
           </Grid>
@@ -408,28 +408,26 @@ export default function AddStockForm() {
           <Grid item xs={12} sm={6}>
             {Array.from(yearlyDividend, ([id, value]) => (
               <Stack spacing={1}>
-                <Item>
-                  <TextField
-                    id="formatted-numberformat-input"
-                    variant="outlined"
-                    fullWidth
-                    className={classes.textField}
-                    label={`Add last ${id} of 5 Year Dividend`}
-                    name="bookValue"
-                    value={value}
-                    onChange={(e) => handleDevidendChange(id, e.target.value)}
-                  />
+                <TextField
+                  id="formatted-numberformat-input"
+                  variant="outlined"
+                  fullWidth
+                  className={classes.textField}
+                  label={`Add last ${id} of 5 Year Dividend`}
+                  name="bookValue"
+                  value={value}
+                  onChange={(e) => handleDevidendChange(id, e.target.value)}
+                />
 
-                  <IconButton
-                    className={classes.button}
-                    onClick={() => handleRemoveInput(id)}
-                    loadingPosition="end"
-                    variant="contained"
-                    color="error"
-                  >
-                    <Delete color="error" />
-                  </IconButton>
-                </Item>
+                <IconButton
+                  className={classes.button}
+                  onClick={() => handleRemoveInput(id)}
+                  loadingPosition="end"
+                  variant="contained"
+                  color="error"
+                >
+                  <Delete color="error" />
+                </IconButton>
               </Stack>
             ))}
             <IconButton
@@ -465,6 +463,6 @@ export default function AddStockForm() {
           </Grid>
         </Grid>
       </form>
-    </div>
+    </Box>
   );
 }
