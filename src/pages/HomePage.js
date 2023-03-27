@@ -11,7 +11,7 @@ export default function HomePage(prosp) {
       <div className="stock-form">
         <AddStockForm />
       </div>
-      <div>
+      <div className="stock-table">
         <StockTable />
       </div>
     </Box>

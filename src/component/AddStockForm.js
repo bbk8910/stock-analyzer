@@ -405,9 +405,9 @@ export default function AddStockForm() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={12}>
             {Array.from(yearlyDividend, ([id, value]) => (
-              <Stack spacing={1}>
+              <Stack spacing={1} direction="row" alignItems="center">
                 <TextField
                   id="formatted-numberformat-input"
                   variant="outlined"

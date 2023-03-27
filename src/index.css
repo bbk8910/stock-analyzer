@@ -14,7 +14,7 @@ code {
 }
 
 .wrapper {
-  max-width: 1536px;
+  max-width: 1500px;
   margin: auto;
   padding: 20px;
   margin-top: 45px;
@@ -31,7 +31,11 @@ code {
 }
 
 .stock-form {
-  max-width: 40%;
+  max-width: 30%;
+}
+
+.stock-table {
+  max-width: 70%;
 }
 
 .btn-round {

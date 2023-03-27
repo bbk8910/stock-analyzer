@@ -20,9 +20,10 @@ const MyTable = () => {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="a dense table" size="small">
+      <Table aria-label="a dense table">
         <TableHead>
           <TableRow>
+            <TableCell>Symbol</TableCell>
             <TableCell>Sector</TableCell>
             <TableCell>EPS</TableCell>
             <TableCell>P/E</TableCell>
@@ -45,6 +46,7 @@ const MyTable = () => {
               <TableCell component="th" scope="row">
                 {row.id}
               </TableCell>
+              <TableCell>{row.name}</TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.age}</TableCell>
               <TableCell>{row.age}</TableCell>
