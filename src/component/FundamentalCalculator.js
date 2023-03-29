@@ -43,3 +43,11 @@ export function getDebtToEquity(totalDebt, totalEquity) {
 export function getGN(eps, bookValue) {
   return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
 }
+
+export function calculateMean(arr) {
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    total += arr[i];
+  }
+  return total / arr.length;
+}

@@ -28,7 +28,7 @@ import {
   getPEG,
   getPERatio,
 } from "./FundamentalCalculator";
-import { save } from "./Dao";
+import { getAllStock, save } from "./StockDao";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -82,17 +82,6 @@ export default function AddStockForm() {
     new Map().set(1, "")
   );
 
-  useEffect(() => {
-    getConsultant();
-  }, []);
-
-  function getConsultant() {}
-
-  // const handleInputChange = (event) => {
-  //   const { name, value } = event.target;
-  //   setFormData({ ...formData, [name]: value });
-  // };
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     register(name, { required: true, value });
@@ -120,7 +109,8 @@ export default function AddStockForm() {
       ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
 
     const payoutRatio = "";
-
+    formData.sector = data.sector;
+    formData.symbol = data.symbol;
     formData.bookValue = bookValue;
     formData.eps = eps;
     formData.pe = pe;
@@ -133,6 +123,17 @@ export default function AddStockForm() {
     formData.debtToEquity = debtToEquity;
     formData.yearToYearGrowth = yearToYearGrowth;
     formData.payoutRatio = payoutRatio;
+    formData.outstandingShare = data.outstandingShare;
+    formData.lastYearOutstandngShare = data.lastYearOutstandngShare;
+    formData.profit = data.profit;
+    formData.lastYearProfit = data.profit;
+    formData.currentPrice = data.currentPrice;
+    formData.lastYearPrice = data.lastYearPrice;
+    formData.mktCapitalization = data.mktCapitalization;
+    formData.deividendHistory = data.deividendHistory;
+    formData.totalAssets = data.totalAssets;
+    formData.totalLiabilities = data.totalLiabilities;
+    formData.totalDebt = data.totalDebt;
 
     console.log("final form data--", formData);
     save(formData);
