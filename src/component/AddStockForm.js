@@ -9,7 +9,7 @@ import {
   Box,
 } from "@material-ui/core";
 
-import { Delete, PlusOneSharp, Save } from "@material-ui/icons";
+import { Cancel, Delete, PlusOneSharp, Save } from "@material-ui/icons";
 import { LoadingButton } from "@mui/lab";
 import { Stack } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -38,7 +38,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
   },
   textField: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(0),
+  },
+  dynamicField: {
+    marginBottom: theme.spacing(1),
   },
   button: {
     marginRight: theme.spacing(2),
@@ -79,6 +82,11 @@ export default function AddStockForm() {
   const [loading, setLoading] = React.useState(false);
 
   const [yearlyDividend, setYearlyDividend] = React.useState(
+    new Map().set(1, "")
+  );
+
+  const [yearlyProfit, setYearlyProfit] = React.useState(new Map().set(1, ""));
+  const [yearlyRevenue, setYearlyRevenue] = React.useState(
     new Map().set(1, "")
   );
 
@@ -155,8 +163,38 @@ export default function AddStockForm() {
     setYearlyDividend(newInputs);
   };
 
+  const handleProfitAddInput = () => {
+    const newId = yearlyProfit.size + 1;
+    setYearlyProfit(new Map(yearlyProfit).set(newId, ""));
+  };
+
+  const handleProfitRemoveInput = (id) => {
+    const newInputs = new Map(yearlyProfit);
+    newInputs.delete(id);
+    setYearlyProfit(newInputs);
+  };
+
+  const handleRevenueAddInput = () => {
+    const newId = yearlyRevenue.size + 1;
+    setYearlyRevenue(new Map(yearlyRevenue).set(newId, ""));
+  };
+
+  const handleRevenueRemoveInput = (id) => {
+    const newInputs = new Map(yearlyRevenue);
+    newInputs.delete(id);
+    setYearlyRevenue(newInputs);
+  };
+
   const handleDevidendChange = (id, value) => {
     setYearlyDividend(new Map(yearlyDividend.set(id, value)));
+  };
+
+  const handleProfitChange = (id, value) => {
+    setYearlyProfit(new Map(yearlyProfit.set(id, value)));
+  };
+
+  const handleRevenueChange = (id, value) => {
+    setYearlyRevenue(new Map(yearlyRevenue.set(id, value)));
   };
 
   return (
@@ -262,7 +300,7 @@ export default function AddStockForm() {
               variant="outlined"
               fullWidth
               className={classes.textField}
-              label="Last Year price"
+              label="Last Year Q4 price"
               name="lastPrice"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
@@ -336,7 +374,7 @@ export default function AddStockForm() {
               variant="outlined"
               fullWidth
               className={classes.textField}
-              label="Last year Profit"
+              label="Last year Profit(Q4)"
               name="lastYearProfit"
               inputProps={{ type: "number" }}
               onChange={handleInputChange}
@@ -406,34 +444,111 @@ export default function AddStockForm() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={6}>
             {Array.from(yearlyDividend, ([id, value]) => (
               <Stack spacing={1} direction="row" alignItems="center">
                 <TextField
                   id="formatted-numberformat-input"
                   variant="outlined"
                   fullWidth
-                  className={classes.textField}
-                  label={`Add last ${id} of 5 Year Dividend`}
+                  className={classes.dynamicField}
+                  label={`${id} of 5 Year Dividend`}
                   name="bookValue"
                   value={value}
                   onChange={(e) => handleDevidendChange(id, e.target.value)}
                 />
 
                 <IconButton
-                  className={classes.button}
+                  // className={classes.button}
                   onClick={() => handleRemoveInput(id)}
                   loadingPosition="end"
                   variant="contained"
                   color="error"
                 >
-                  <Delete color="error" />
+                  <Cancel color="error" />
                 </IconButton>
               </Stack>
             ))}
             <IconButton
               className={`${classes.button}`}
               onClick={handleAddInput}
+              endIcon={<PlusOneSharp />}
+              loading={loading}
+              loadingPosition="end"
+              variant="contained"
+              color="primary"
+            >
+              <AddCircleOutlineOutlined />
+            </IconButton>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            {Array.from(yearlyProfit, ([id, value]) => (
+              <Stack spacing={1} direction="row" alignItems="center">
+                <TextField
+                  id="formatted-numberformat-input"
+                  variant="outlined"
+                  fullWidth
+                  className={classes.dynamicField}
+                  label={`${id} of 3 Year Profit(Q4)`}
+                  name="bookValue"
+                  value={value}
+                  onChange={(e) => handleProfitChange(id, e.target.value)}
+                />
+
+                <IconButton
+                  className={classes.button}
+                  onClick={() => handleProfitRemoveInput(id)}
+                  loadingPosition="end"
+                  variant="contained"
+                  color="error"
+                  style={{ textAlign: "center" }}
+                >
+                  <Cancel color="error" />
+                </IconButton>
+              </Stack>
+            ))}
+            <IconButton
+              className={`${classes.button}`}
+              onClick={handleProfitAddInput}
+              endIcon={<PlusOneSharp />}
+              loading={loading}
+              loadingPosition="end"
+              variant="contained"
+              color="primary"
+            >
+              <AddCircleOutlineOutlined />
+            </IconButton>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            {Array.from(yearlyRevenue, ([id, value]) => (
+              <Stack direction="row" alignItems="center">
+                <TextField
+                  id="formatted-numberformat-input"
+                  variant="outlined"
+                  fullWidth
+                  className={classes.dynamicField}
+                  label={`${id} of 3 Year Revenue(Q4)`}
+                  name="bookValue"
+                  value={value}
+                  onChange={(e) => handleRevenueChange(id, e.target.value)}
+                />
+
+                <IconButton
+                  className={classes.button}
+                  onClick={() => handleRevenueRemoveInput(id)}
+                  loadingPosition="end"
+                  variant="contained"
+                  color="error"
+                >
+                  <Cancel color="error" />
+                </IconButton>
+              </Stack>
+            ))}
+            <IconButton
+              className={`${classes.button}`}
+              onClick={handleRevenueAddInput}
               endIcon={<PlusOneSharp />}
               loading={loading}
               loadingPosition="end"

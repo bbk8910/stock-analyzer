@@ -40,9 +40,21 @@ export function getDebtToEquity(totalDebt, totalEquity) {
   return (totalDebt / totalEquity).toFixed(2);
 }
 
+export function getHigerThanGNInPercentage(eps, bookValue, currentPrice) {
+  const gn = getGN(eps, bookValue);
+  return ((currentPrice - gn) / gn) * 100;
+}
+
 export function getGN(eps, bookValue) {
   return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
 }
+
+// export function getYearToYearGrowth(
+//   lastYeaQFourClosingPrice,
+//   currentQarterClosingPrice
+// ) {
+//   return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
+// }
 
 export function calculateMean(arr) {
   let total = 0;
