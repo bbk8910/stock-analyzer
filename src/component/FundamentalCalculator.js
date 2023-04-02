@@ -46,7 +46,7 @@ export function getHigerThanGNInPercentage(eps, bookValue, currentPrice) {
 }
 
 export function getGN(eps, bookValue) {
-  return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
+  return Number(Math.sqrt(22.5 * eps * bookValue).toFixed(2));
 }
 
 // export function getYearToYearGrowth(
@@ -56,6 +56,60 @@ export function getGN(eps, bookValue) {
 //   return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
 // }
 
+export function getAvgDividendYield(history, currentPrice) {
+  let array = Array.from(history.values());
+  let avarageDividend = calculateMean(array);
+  return (avarageDividend / currentPrice) * 100;
+}
+
+export function getCurrentDividendYield(history, currentPrice) {
+  let lastYearDividend = Number(history.get(1));
+  return (lastYearDividend / currentPrice) * 100;
+}
+
+export function getPriceYOYGrowth(lastYearPrice, currentPrice) {
+  let array = [lastYearPrice, currentPrice];
+  return calculateGrowthRate(array);
+}
+
+export function getProfitYOYGrowth(history, currentPrice) {
+  let array = Array.from(history.values());
+  return calculateGrowthRate(array);
+}
+
+export function getRevenueYOYGrwoth(history) {
+  let array = Array.from(history.values());
+  return calculateGrowthRate(array);
+}
+
+export function calculateGrowthRate(values) {
+  const yoyGrowthRates = [];
+  let positiveGrowthCount = 0;
+  let negativeGrowthCount = 0;
+
+  for (let i = 1; i < values.length; i++) {
+    const yoyGrowth = ((values[i] - values[i - 1]) / values[i - 1]) * 100;
+    yoyGrowthRates.push(yoyGrowth);
+  }
+
+  for (let i = 0; i < yoyGrowthRates.length; i++) {
+    if (yoyGrowthRates[i] > 0) {
+      console.log(`Year ${i + 1}: Positive growth of ${yoyGrowthRates[i]}%`);
+      positiveGrowthCount = positiveGrowthCount + 1;
+    } else if (yoyGrowthRates[i] < 0) {
+      negativeGrowthCount = negativeGrowthCount + 1;
+      console.log(`Year ${i + 1}: Negative growth of ${yoyGrowthRates[i]}%`);
+    } else {
+      console.log(`Year ${i + 1}: No growth`);
+    }
+  }
+
+  if (positiveGrowthCount > negativeGrowthCount) {
+    return true;
+  }
+  return false;
+}
+
 export function calculateMean(arr) {
   let total = 0;
   for (let i = 0; i < arr.length; i++) {
@@ -63,3 +117,5 @@ export function calculateMean(arr) {
   }
   return total / arr.length;
 }
+
+//-----long term---------

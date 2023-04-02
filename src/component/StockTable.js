@@ -1,140 +1,275 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
+  Box,
+  Button,
+  IconButton,
+  Dialog,
+  List,
+  ListItem,
+  ListItemText,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
+import {
+  getEpsStatus,
+  getGNPercentStatus,
+  getPBStatus,
+  getPEGStatus,
+  getPEStatus,
+  getROAStatus,
+  getROEStatus,
+  getUpDown,
+} from "./Report";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarDensitySelector,
+  GridToolbarFilterButton,
+} from "@mui/x-data-grid";
+import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
+import { deleteStock } from "./StockDao";
+import { Stack } from "@mui/material";
+// import { useSelection } from "@mui/x-data-grid";
 
 export default function StockTable(props) {
-  const { stockMap } = props;
-  console.log("stock list", stockMap);
+  const { stockMap, setFormData, formData } = props;
+  // const selectionModel = useSelection();
+  const [dataList, setDataList] = React.useState([]);
 
-  console.log("type of stockListMap", typeof stockMap);
+  const [selectionModel, setSelectionModel] = React.useState([]);
+  let viewData = {};
 
-  // if (!(stockMap instanceof Map)) {
-  //   return <div>Provided data is not a Map object</div>;
-  // }
+  useEffect(() => {
+    const list = Object.entries(stockMap).map(([symbol, row], index) => {
+      const data = {
+        ...row,
+        symbol: symbol,
+        id: symbol,
+      };
 
-  const data = {
-    ADBL: {
-      sector: "Banking",
-      symbol: "ADBL",
-      outstandingShare: "",
-      lastYearOutstandngShare: "",
-      currentPrice: "",
-      purchasePrice: "",
-      profit: "",
-      lastYearProfit: "",
-      mktCapitalization: "",
-      paidUpCapital: "",
-      totalAssets: "4560000000",
-      totalLiabilities: "3200000",
-      totalDebt: "",
-      deividendHistory: {},
-      bookValue: 4556800000,
-      eps: "0.00",
-      pe: "Infinity",
-      peg: "Infinity",
-      pb: "0.00",
-      roe: "0.01",
-      roa: "0.07",
-      gn: "0.00",
-      debtToEquity: "0.00",
-      yearToYearGrowth: -2.857142857142857,
-      payoutRatio: "",
+      return data;
+    });
+    setDataList(list);
+  }, [stockMap]);
+
+  const columns = [
+    { field: "symbol", headerName: "Symbol" },
+    { field: "sector", headerName: "Sector" },
+    {
+      field: "eps",
+      headerName: "EPS",
+      renderCell: (params) => getEpsStatus(params.row.eps),
     },
-    CBBL: {
-      sector: "Microfinance",
-      symbol: "CBBL",
-      outstandingShare: "230000",
-      lastYearOutstandngShare: "435666",
-      currentPrice: "2344",
-      purchasePrice: "",
-      profit: "3200000",
-      lastYearProfit: "3200000",
-      mktCapitalization: "45000000",
-      paidUpCapital: "",
-      totalAssets: "3088999999999991",
-      totalLiabilities: "34000000",
-      totalDebt: "",
-      deividendHistory: {},
-      bookValue: 3088999965999991,
-      eps: "13.91",
-      pe: "168.51",
-      peg: "19.53",
-      pb: "0.00",
-      roe: "1043.48",
-      roa: "0.00",
-      gn: "983249594.13",
-      debtToEquity: "1.50",
-      yearToYearGrowth: 589.4117647058824,
-      payoutRatio: "",
+    {
+      field: "pe",
+      headerName: "P/E",
+      renderCell: (params) => getPEStatus(params.row.pe),
     },
+    {
+      field: "pb",
+      headerName: "PB",
+      renderCell: (params) => getPBStatus(params.row.pb),
+    },
+    {
+      field: "peg",
+      headerName: "PEG",
+      renderCell: (params) => getPEGStatus(params.row.peg),
+    },
+    {
+      field: "roe",
+      headerName: "ROE",
+      renderCell: (params) => getROEStatus(params.row.roe),
+    },
+    {
+      field: "roa",
+      headerName: "ROA",
+      renderCell: (params) => getROAStatus(params.row.roa),
+    },
+    {
+      field: "gnAbove",
+      headerName: "GN % Above",
+      renderCell: (params) => getGNPercentStatus(params.row.gnAbove),
+    },
+
+    {
+      field: "priceYoYGrowth",
+      headerName: "PriceYOYGrowth",
+      renderCell: (params) => getUpDown(params.row.priceYoYGrowth),
+    },
+
+    {
+      field: "profitYoYGrowth",
+      headerName: "ProfitYOYGrowth",
+      renderCell: (params) => getUpDown(params.row.profitYoYGrowth),
+    },
+
+    {
+      field: "revenueYoYGrowth",
+      headerName: "RevenueYOYGrowth",
+      renderCell: (params) => getUpDown(params.row.revenueYoYGrowth),
+    },
+
+    {
+      field: "view",
+      headerName: "Actions",
+      width: 165,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            startIcon={<ViewAgenda />}
+            onClick={() => {
+              const data = new Map(Object.entries(stockMap)).get(
+                params.row.symbol
+              );
+              setFormData(data);
+              viewData = data;
+              handleClickOpen();
+
+              console.log("paraa", data);
+            }}
+          >
+            view
+          </Button>
+
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            startIcon={<Edit />}
+            onClick={() => {
+              const data = new Map(Object.entries(stockMap)).get(
+                params.row.symbol
+              );
+              setFormData(data);
+
+              console.log("paraa", data);
+            }}
+          >
+            Edit
+          </Button>
+        </Stack>
+      ),
+    },
+  ];
+
+  function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <IconButton
+          onClick={() => {
+            const selectedIDs = new Set(selectionModel);
+            console.log("selected id", selectedIDs);
+            deleteStock(selectedIDs).then(() => {
+              setDataList((r) => r.filter((x) => !selectedIDs.has(x.id)));
+            });
+          }}
+        >
+          <DeleteForever />
+        </IconButton>
+      </GridToolbarContainer>
+    );
+  }
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
   };
-  console.log("l1", data);
-  console.log("l2", stockMap);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  let data = {
+    sector: "Banking",
+    id: "AHL",
+    bookValue: -278,
+    eps: "1.44",
+    pe: "542.36",
+    peg: "-1153.96",
+    pb: "-2.81",
+    roe: "107.88",
+    roa: "1296.83",
+    gn: null,
+    gnAbove: null,
+    paidUpCapital: "",
+    debtToEquity: "1.28",
+    yearToYearGrowth: -16.291532690246516,
+    payoutRatio: "",
+    outstandingShare: "568",
+    lastYearOutstandngShare: "280",
+    profit: "817",
+    lastYearProfit: "534",
+    currentPrice: "781",
+    mktCapitalization: "494",
+    totalAssets: "84",
+    totalLiabilities: "362",
+    totalDebt: "727",
+    currentDividendYield: 17.92573623559539,
+    avgDividendYield: 17.92573623559539,
+    deividendHistory: {},
+    profitHistory: {},
+    revenueHistory: {},
+    priceYoYGrowth: false,
+    profitYoYGrowth: false,
+    revenueYoYGrowth: false,
+  };
+
+  function getListItem(data) {
+    let listItem = Object.entries(data)?.map(([key, value]) => (
+      <ListItem key={key}>
+        <ListItemText primary={key} secondary={value} />
+      </ListItem>
+    ));
+    return listItem;
+  }
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small" aria-label="a dense table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Symbol</TableCell>
-            <TableCell>Sector</TableCell>
-            <TableCell>EPS</TableCell>
-            <TableCell>P/E</TableCell>
-            <TableCell>PB</TableCell>
-            <TableCell>Book Value</TableCell>
-            <TableCell>PEG</TableCell>
-            <TableCell>ROE</TableCell>
-            <TableCell>ROA</TableCell>
-            <TableCell>Graham Number</TableCell>
-            <TableCell>Paid Up Capital</TableCell>
-            <TableCell>Debt to equity</TableCell>
-            <TableCell>YOY Growth(%)</TableCell>
-            <TableCell>Payout raio(%)</TableCell>
-            <TableCell>LTP</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Object.entries(data).map(([key, row]) => {
-            {
-              console.log("key ---->row", key, row);
-            }
-            return (
-              <TableRow
-                key={key}
-                sx={{ cursor: "pointer" }}
-                role="checkbox"
-                hover
-              >
-                <TableCell component="th" scope="row">
-                  {key}
-                </TableCell>
-
-                <TableCell>{row.sector}</TableCell>
-                <TableCell>{row.eps}</TableCell>
-                <TableCell>{row.pe}</TableCell>
-                <TableCell>{row.pb}</TableCell>
-                <TableCell>{row.bookValue}</TableCell>
-                <TableCell>{row.peg}</TableCell>
-                <TableCell>{row.roe}</TableCell>
-                <TableCell>{row.roa}</TableCell>
-                <TableCell>{row.gn}</TableCell>
-                <TableCell>{row.paidUpCapital}</TableCell>
-                <TableCell>{row.debtToEquity}</TableCell>
-                <TableCell>{row.yearToYearGrowth}</TableCell>
-                <TableCell>{row.payoutRatio}</TableCell>
-                <TableCell>{row.currentPrice}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Box style={{ height: 400, width: "100%" }} component={Paper}>
+      {/* <Button
+        variant="contained"
+        color="secondary"
+        disabled={!selectionModel.selectedIds.length}
+        onClick={() => {
+          const newRows = dataList.filter(
+            (row) => !selectionModel.selectedIds.includes(row.id)
+          );
+          setDataList(newRows);
+          selectionModel.setDeselectedIds(selectionModel.selectedIds);
+        }}
+      >
+        Delete Selected Rows
+      </Button> */}
+      <DataGrid
+        rows={[...dataList]}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+        components={{
+          Toolbar: CustomToolbar,
+        }}
+        onRowSelectionModelChange={(ids) => {
+          setSelectionModel(ids);
+        }}
+      />
+      {getListItem(formData)}
+      {/* <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Subscribe</DialogTitle>
+        <DialogContentText>
+          To subscribe to this website, please enter your email address here. We
+          will send updates occasionally.
+          <List>
+            {console.log("jsond data", formData)}
+            {getListItem(data)}
+          </List>
+        </DialogContentText>
+      </Dialog> */}
+    </Box>
   );
 }

@@ -5,7 +5,7 @@ import { getAllStock } from "../component/StockDao";
 import StockTable from "../component/StockTable";
 
 export default function HomePage(prosp) {
-  const [stockMap, setStockMap] = React.useState({});
+  const [stockMap, setStockMap] = React.useState([]);
   const [formData, setFormData] = React.useState({});
 
   useEffect(() => {
@@ -14,21 +14,22 @@ export default function HomePage(prosp) {
 
   function getStocksMap() {
     const data = getAllStock();
-    const map = new Map(Object.entries(data));
+
     setStockMap(data);
-    console.log("get all laist", map);
+    console.log("get all laist", data);
   }
 
   return (
-    <Box
-      sx={{ width: "100%", bgcolor: "background.paper" }}
-      className="wrapper home-page-wrapper"
-    >
+    <Box sx={{ width: "100%" }} className="page-wrapper">
       <div className="stock-form">
         <AddStockForm formData={formData} />
       </div>
       <div className="stock-table">
-        <StockTable stockMap={stockMap} setFormData={setFormData} />
+        <StockTable
+          stockMap={stockMap}
+          setFormData={setFormData}
+          formData={formData}
+        />
       </div>
     </Box>
   );

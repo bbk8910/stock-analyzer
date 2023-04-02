@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Button,
   Grid,
@@ -9,12 +9,10 @@ import {
   Box,
 } from "@material-ui/core";
 
-import { Cancel, Delete, PlusOneSharp, Save } from "@material-ui/icons";
+import { Cancel, PlusOneSharp, Save } from "@material-ui/icons";
 import { LoadingButton } from "@mui/lab";
 import { Stack } from "@mui/material";
-import Paper from "@mui/material/Paper";
 
-import { styled } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
 import {
@@ -24,11 +22,19 @@ import {
   getDebtToEquity,
   getEps,
   getGN,
+  getHigerThanGNInPercentage,
   getPB,
   getPEG,
   getPERatio,
-} from "./FundamentalCalculator";
-import { getAllStock, save } from "./StockDao";
+  getPriceYOYGrowth,
+  getProfitYOYGrowth,
+  getRevenueYOYGrwoth,
+} from "./FundamentalCalculator.js";
+import { save } from "./StockDao";
+import {
+  getAvgDividendYield,
+  getCurrentDividendYield,
+} from "./FundamentalCalculator.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,30 +57,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddStockForm() {
-  const [formData, setFormData] = React.useState({
-    sector: "",
-    symbol: "",
-    outstandingShare: "",
-    lastYearOutstandngShare: "",
-    currentPrice: "",
-    purchasePrice: "",
-    profit: "",
-    lastYearProfit: "",
-
-    mktCapitalization: "",
-    paidUpCapital: "",
-    totalAssets: "",
-    totalLiabilities: "",
-    totalDebt: "",
-    deividendHistory: new Map(),
-  });
+export default function AddStockForm(props) {
+  console.log("form data in add stock form", props.formData);
+  const [formData, setFormData] = React.useState(props.formData);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: formData,
+    values: props.formData,
   });
 
   const classes = useStyles();
@@ -111,14 +102,35 @@ export default function AddStockForm() {
     const roe = getAnnualizedROE(data.profit, data.outstandingShare);
     const roa = getAnnualizedROA(data.profit, data.totalAssets);
     const gn = getGN(eps, bookValue);
+    const gnAbove = getHigerThanGNInPercentage(
+      eps,
+      bookValue,
+      data.currentPrice
+    );
     const paidUpCapital = "";
     const debtToEquity = getDebtToEquity(data.totalDebt, data.outstandingShare);
     const yearToYearGrowth =
       ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
 
+    const avgDividendYield = getAvgDividendYield(
+      yearlyDividend,
+      data.currentPrice
+    );
+    const currentDividendYield = getCurrentDividendYield(
+      yearlyDividend,
+      data.currentPrice
+    );
+
+    const revenueYoYGrowth = getRevenueYOYGrwoth(yearlyRevenue);
+    const profitYoYGrowth = getProfitYOYGrowth(yearlyProfit);
+    const priceYoYGrowth = getPriceYOYGrowth(
+      data.lastYearPrice,
+      data.currentPrice
+    );
+
     const payoutRatio = "";
     formData.sector = data.sector;
-    formData.symbol = data.symbol;
+    formData.id = data.id;
     formData.bookValue = bookValue;
     formData.eps = eps;
     formData.pe = pe;
@@ -127,6 +139,7 @@ export default function AddStockForm() {
     formData.roe = roe;
     formData.roa = roa;
     formData.gn = gn;
+    formData.gnAbove = gnAbove;
     formData.paidUpCapital = paidUpCapital;
     formData.debtToEquity = debtToEquity;
     formData.yearToYearGrowth = yearToYearGrowth;
@@ -134,14 +147,21 @@ export default function AddStockForm() {
     formData.outstandingShare = data.outstandingShare;
     formData.lastYearOutstandngShare = data.lastYearOutstandngShare;
     formData.profit = data.profit;
-    formData.lastYearProfit = data.profit;
+    formData.lastYearProfit = data.lastYearProfit;
     formData.currentPrice = data.currentPrice;
     formData.lastYearPrice = data.lastYearPrice;
     formData.mktCapitalization = data.mktCapitalization;
-    formData.deividendHistory = data.deividendHistory;
     formData.totalAssets = data.totalAssets;
     formData.totalLiabilities = data.totalLiabilities;
     formData.totalDebt = data.totalDebt;
+    formData.currentDividendYield = currentDividendYield;
+    formData.avgDividendYield = avgDividendYield;
+    formData.deividendHistory = yearlyDividend;
+    formData.profitHistory = yearlyProfit;
+    formData.revenueHistory = yearlyRevenue;
+    formData.priceYoYGrowth = priceYoYGrowth;
+    formData.profitYoYGrowth = profitYoYGrowth;
+    formData.revenueYoYGrowth = revenueYoYGrowth;
 
     console.log("final form data--", formData);
     save(formData);
@@ -215,10 +235,31 @@ export default function AddStockForm() {
               onChange={handleInputChange}
               {...register("sector", { required: true })}
               error={errors.sector ? true : false}
+              InputLabelProps={{
+                shrink: true,
+              }}
               helperText={
                 errors.sector?.type === "required" && "Sector is required"
               }
             />
+            {/* <FormControl fullWidth>
+              <InputLabel style={{ marginLeft: 15 }} focused>
+                Sector
+              </InputLabel>
+              <Select
+                labelId="demo-multiple-name-label"
+                id="demo-multiple-name"
+                name="sector"
+                onChange={handleInputChange}
+                input={<OutlinedInput />}
+              >
+                {SECTOR_LIST.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -227,12 +268,15 @@ export default function AddStockForm() {
               fullWidth
               className={classes.textField}
               label="Symbol"
-              name="symbol"
+              name="id"
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
-              {...register("symbol", { required: true })}
-              error={errors.symbol ? true : false}
+              {...register("id", { required: true })}
+              error={errors.id ? true : false}
               helperText={
-                errors.symbol?.type === "required" && "Symbol is required"
+                errors.id?.type === "required" && "Symbol is required"
               }
             />
           </Grid>
@@ -246,6 +290,9 @@ export default function AddStockForm() {
               label="Outstanding Share"
               name="outstandingShare"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("outstandingShare", { required: true })}
               error={errors.outstandingShare ? true : false}
@@ -265,6 +312,9 @@ export default function AddStockForm() {
               label="Last Year Outstanding Share"
               name="lastYearOutstandngShare"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("lastYearOutstandngShare", { required: true })}
               error={errors.lastYearOutstandngShare ? true : false}
@@ -284,6 +334,9 @@ export default function AddStockForm() {
               label="Current price"
               name="currentPrice"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("currentPrice", { required: true })}
               error={errors.currentPrice ? true : false}
@@ -303,6 +356,9 @@ export default function AddStockForm() {
               label="Last Year Q4 price"
               name="lastPrice"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("lastPrice", { required: true })}
               error={errors.lastPrice ? true : false}
@@ -340,6 +396,9 @@ export default function AddStockForm() {
               label="Market Capitalization"
               name="mktCapitalization"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("mktCapitalization", { required: true })}
               error={errors.mktCapitalization ? true : false}
@@ -359,6 +418,9 @@ export default function AddStockForm() {
               label="Profit"
               name="profit"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("profit", { required: true })}
               error={errors.profit ? true : false}
@@ -377,6 +439,9 @@ export default function AddStockForm() {
               label="Last year Profit(Q4)"
               name="lastYearProfit"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("lastYearProfit", { required: true })}
               error={errors.lastYearProfit ? true : false}
@@ -396,6 +461,9 @@ export default function AddStockForm() {
               label="Total Assets"
               name="totalAssets"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("totalAssets", { required: true })}
               error={errors.totalAssets ? true : false}
@@ -415,6 +483,9 @@ export default function AddStockForm() {
               label="Total Liabilites"
               name="totalLiabilities"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("totalLiabilities", { required: true })}
               error={errors.totalLiabilities ? true : false}
@@ -434,6 +505,9 @@ export default function AddStockForm() {
               label="Total Debt"
               name="totalDebt"
               inputProps={{ type: "number" }}
+              InputLabelProps={{
+                shrink: true,
+              }}
               onChange={handleInputChange}
               {...register("totalDebt", { required: true })}
               error={errors.totalDebt ? true : false}
@@ -452,7 +526,10 @@ export default function AddStockForm() {
                   variant="outlined"
                   fullWidth
                   className={classes.dynamicField}
-                  label={`${id} of 5 Year Dividend`}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label={`${id} of 5 Year Dividend(%)`}
                   name="bookValue"
                   value={value}
                   onChange={(e) => handleDevidendChange(id, e.target.value)}
@@ -490,6 +567,9 @@ export default function AddStockForm() {
                   variant="outlined"
                   fullWidth
                   className={classes.dynamicField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                   label={`${id} of 3 Year Profit(Q4)`}
                   name="bookValue"
                   value={value}
@@ -530,6 +610,9 @@ export default function AddStockForm() {
                   fullWidth
                   className={classes.dynamicField}
                   label={`${id} of 3 Year Revenue(Q4)`}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                   name="bookValue"
                   value={value}
                   onChange={(e) => handleRevenueChange(id, e.target.value)}
@@ -563,7 +646,7 @@ export default function AddStockForm() {
             <Stack direction="row" spacing={1}>
               <LoadingButton
                 className={classes.button}
-                onClick={null}
+                onClick={handleSubmit}
                 endIcon={<Save />}
                 loading={false}
                 loadingPosition="end"

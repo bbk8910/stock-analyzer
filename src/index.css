@@ -13,29 +13,25 @@ code {
     monospace;
 }
 
-.wrapper {
-  max-width: 1500px;
-  margin: auto;
-  padding: 20px;
-  margin-top: 45px;
-}
-
 .display-flex {
   display: flex;
 }
 
-.home-page-wrapper {
+.page-wrapper {
   display: flex;
   gap: 20px;
+  max-width: 1500px;
+  margin: auto;
+  padding: 20px;
   /* align-items: center; */
 }
 
 .stock-form {
-  max-width: 40%;
+  max-width: 35%;
 }
 
 .stock-table {
-  max-width: 60%;
+  max-width: 65%;
 }
 
 .btn-round {
