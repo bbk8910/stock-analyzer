@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Grid,
@@ -80,6 +80,11 @@ export default function AddStockForm(props) {
   const [yearlyRevenue, setYearlyRevenue] = React.useState(
     new Map().set(1, "")
   );
+
+  // useEffect(() => {
+  //   console.log("formd000", formData);
+  //   setYearlyDividend(new Map(formData.yearlyDividend));
+  // }, []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;

@@ -1,6 +1,7 @@
 import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "./Constant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import { hasGrowth } from "./FundamentalCalculator";
 
 const getStatusText = (status, value) => {
   return status === UNDER_VALUED ? (
@@ -11,7 +12,8 @@ const getStatusText = (status, value) => {
 };
 
 export const getUpDown = (value) => {
-  return value ? (
+  const growth = hasGrowth(value);
+  return growth ? (
     <TrendingUpIcon style={{ color: "green" }} />
   ) : (
     <TrendingDownIcon style={{ color: "red" }} />

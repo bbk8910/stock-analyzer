@@ -23,6 +23,7 @@ import {
 } from "./Report";
 import {
   DataGrid,
+  GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarDensitySelector,
   GridToolbarFilterButton,
@@ -30,15 +31,13 @@ import {
 import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
 import { deleteStock } from "./StockDao";
 import { Stack } from "@mui/material";
-// import { useSelection } from "@mui/x-data-grid";
+import { StockDetail } from "./StockDetail";
 
 export default function StockTable(props) {
   const { stockMap, setFormData, formData } = props;
-  // const selectionModel = useSelection();
   const [dataList, setDataList] = React.useState([]);
 
   const [selectionModel, setSelectionModel] = React.useState([]);
-  let viewData = {};
 
   useEffect(() => {
     const list = Object.entries(stockMap).map(([symbol, row], index) => {
@@ -126,7 +125,6 @@ export default function StockTable(props) {
                 params.row.symbol
               );
               setFormData(data);
-              viewData = data;
               handleClickOpen();
 
               console.log("paraa", data);
@@ -141,7 +139,7 @@ export default function StockTable(props) {
             color="primary"
             startIcon={<Edit />}
             onClick={() => {
-              const data = new Map(Object.entries(stockMap)).get(
+              const data = new Map(Object.entries(stockMap || [])).get(
                 params.row.symbol
               );
               setFormData(data);
@@ -161,6 +159,8 @@ export default function StockTable(props) {
       <GridToolbarContainer>
         <GridToolbarFilterButton />
         <GridToolbarDensitySelector />
+        <GridToolbarColumnsButton />
+
         <IconButton
           onClick={() => {
             const selectedIDs = new Set(selectionModel);
@@ -184,40 +184,6 @@ export default function StockTable(props) {
 
   const handleClose = () => {
     setOpen(false);
-  };
-  let data = {
-    sector: "Banking",
-    id: "AHL",
-    bookValue: -278,
-    eps: "1.44",
-    pe: "542.36",
-    peg: "-1153.96",
-    pb: "-2.81",
-    roe: "107.88",
-    roa: "1296.83",
-    gn: null,
-    gnAbove: null,
-    paidUpCapital: "",
-    debtToEquity: "1.28",
-    yearToYearGrowth: -16.291532690246516,
-    payoutRatio: "",
-    outstandingShare: "568",
-    lastYearOutstandngShare: "280",
-    profit: "817",
-    lastYearProfit: "534",
-    currentPrice: "781",
-    mktCapitalization: "494",
-    totalAssets: "84",
-    totalLiabilities: "362",
-    totalDebt: "727",
-    currentDividendYield: 17.92573623559539,
-    avgDividendYield: 17.92573623559539,
-    deividendHistory: {},
-    profitHistory: {},
-    revenueHistory: {},
-    priceYoYGrowth: false,
-    profitYoYGrowth: false,
-    revenueYoYGrowth: false,
   };
 
   function getListItem(data) {
@@ -258,18 +224,7 @@ export default function StockTable(props) {
           setSelectionModel(ids);
         }}
       />
-      {getListItem(formData)}
-      {/* <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Subscribe</DialogTitle>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We
-          will send updates occasionally.
-          <List>
-            {console.log("jsond data", formData)}
-            {getListItem(data)}
-          </List>
-        </DialogContentText>
-      </Dialog> */}
+      <StockDetail open={open} handleClose={handleClose} detail={formData} />
     </Box>
   );
 }

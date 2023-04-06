@@ -84,13 +84,16 @@ export function getRevenueYOYGrwoth(history) {
 
 export function calculateGrowthRate(values) {
   const yoyGrowthRates = [];
-  let positiveGrowthCount = 0;
-  let negativeGrowthCount = 0;
-
   for (let i = 1; i < values.length; i++) {
     const yoyGrowth = ((values[i] - values[i - 1]) / values[i - 1]) * 100;
     yoyGrowthRates.push(yoyGrowth);
   }
+  return yoyGrowthRates;
+}
+
+export function hasGrowth(yoyGrowthRates) {
+  let positiveGrowthCount = 0;
+  let negativeGrowthCount = 0;
 
   for (let i = 0; i < yoyGrowthRates.length; i++) {
     if (yoyGrowthRates[i] > 0) {
