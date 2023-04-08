@@ -95,7 +95,7 @@ export function hasGrowth(yoyGrowthRates) {
   let positiveGrowthCount = 0;
   let negativeGrowthCount = 0;
 
-  for (let i = 0; i < yoyGrowthRates.length; i++) {
+  for (let i = 0; i < yoyGrowthRates?.length; i++) {
     if (yoyGrowthRates[i] > 0) {
       console.log(`Year ${i + 1}: Positive growth of ${yoyGrowthRates[i]}%`);
       positiveGrowthCount = positiveGrowthCount + 1;

@@ -29,9 +29,10 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
-import { deleteStock } from "./StockDao";
+import { deleteData, deleteStock, stockStore } from "./StockDao";
 import { Stack } from "@mui/material";
 import { StockDetail } from "./StockDetail";
+import { storeName } from "./Constant";
 
 export default function StockTable(props) {
   const { stockMap, setFormData, formData } = props;
@@ -165,7 +166,7 @@ export default function StockTable(props) {
           onClick={() => {
             const selectedIDs = new Set(selectionModel);
             console.log("selected id", selectedIDs);
-            deleteStock(selectedIDs).then(() => {
+            deleteData(stockStore, selectedIDs).then(() => {
               setDataList((r) => r.filter((x) => !selectedIDs.has(x.id)));
             });
           }}

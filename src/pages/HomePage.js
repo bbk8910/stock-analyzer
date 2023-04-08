@@ -1,7 +1,7 @@
 import { Box } from "@material-ui/core";
 import React, { useEffect } from "react";
 import AddStockForm from "../component/AddStockForm";
-import { getAllStock } from "../component/StockDao";
+import { getAllData, getAllStock, stockStore } from "../component/StockDao";
 import StockTable from "../component/StockTable";
 
 export default function HomePage(prosp) {
@@ -13,10 +13,10 @@ export default function HomePage(prosp) {
   }, []);
 
   function getStocksMap() {
-    const data = getAllStock();
-
-    setStockMap(data);
-    console.log("get all laist", data);
+    const data = getAllData(stockStore).then((data) => {
+      setStockMap(data);
+      console.log("get all laist", data);
+    });
   }
 
   return (

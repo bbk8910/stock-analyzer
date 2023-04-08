@@ -30,11 +30,12 @@ import {
   getProfitYOYGrowth,
   getRevenueYOYGrwoth,
 } from "./FundamentalCalculator.js";
-import { save } from "./StockDao";
+import { add, addData, save, stockStore } from "./StockDao";
 import {
   getAvgDividendYield,
   getCurrentDividendYield,
 } from "./FundamentalCalculator.js";
+import { storeName } from "./Constant.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -112,7 +113,7 @@ export default function AddStockForm(props) {
       bookValue,
       data.currentPrice
     );
-    const paidUpCapital = "";
+
     const debtToEquity = getDebtToEquity(data.totalDebt, data.outstandingShare);
     const yearToYearGrowth =
       ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
@@ -126,16 +127,18 @@ export default function AddStockForm(props) {
       data.currentPrice
     );
 
-    const revenueYoYGrowth = getRevenueYOYGrwoth(yearlyRevenue);
-    const profitYoYGrowth = getProfitYOYGrowth(yearlyProfit);
-    const priceYoYGrowth = getPriceYOYGrowth(
-      data.lastYearPrice,
-      data.currentPrice
-    );
+    // const revenueYoYGrowth = getRevenueYOYGrwoth(yearlyRevenue);
+    // const profitYoYGrowth = getProfitYOYGrowth(yearlyProfit);
+    // const priceYoYGrowth = getPriceYOYGrowth(
+    //   data.lastYearPrice,
+    //   data.currentPrice
+    // );
 
     const payoutRatio = "";
+    const paidUpCapital = "";
+
     formData.sector = data.sector;
-    formData.id = data.id;
+    formData.symbol = data.symbol;
     formData.bookValue = bookValue;
     formData.eps = eps;
     formData.pe = pe;
@@ -159,17 +162,21 @@ export default function AddStockForm(props) {
     formData.totalAssets = data.totalAssets;
     formData.totalLiabilities = data.totalLiabilities;
     formData.totalDebt = data.totalDebt;
-    formData.currentDividendYield = currentDividendYield;
+
     formData.avgDividendYield = avgDividendYield;
-    formData.deividendHistory = yearlyDividend;
-    formData.profitHistory = yearlyProfit;
-    formData.revenueHistory = yearlyRevenue;
-    formData.priceYoYGrowth = priceYoYGrowth;
-    formData.profitYoYGrowth = profitYoYGrowth;
-    formData.revenueYoYGrowth = revenueYoYGrowth;
+    formData.yearlyDividend = yearlyDividend;
+    formData.yearlyProfit = yearlyProfit;
+    formData.yearlyRevenue = yearlyRevenue;
+
+    formData.currentDividendYield = currentDividendYield;
+    // formData.priceYoYGrowth = priceYoYGrowth;
+    // formData.profitYoYGrowth = profitYoYGrowth;
+    // formData.revenueYoYGrowth = revenueYoYGrowth;
 
     console.log("final form data--", formData);
-    save(formData);
+    addData(formData, stockStore)
+      .then(() => console.log("Data added successfully"))
+      .catch((error) => console.error(error));
   };
 
   const handleOptionChange = (name) => (event, value) => {
@@ -273,15 +280,15 @@ export default function AddStockForm(props) {
               fullWidth
               className={classes.textField}
               label="Symbol"
-              name="id"
+              name="symbol"
               InputLabelProps={{
                 shrink: true,
               }}
               onChange={handleInputChange}
-              {...register("id", { required: true })}
-              error={errors.id ? true : false}
+              {...register("symbol", { required: true })}
+              error={errors.symbol ? true : false}
               helperText={
-                errors.id?.type === "required" && "Symbol is required"
+                errors.symbol?.type === "required" && "Symbol is required"
               }
             />
           </Grid>
