@@ -20,7 +20,7 @@ const getDB = () => {
           // Check if store exists
           db.createObjectStore(storeName, {
             keyPath: "id",
-            autoIncrement: true,
+            autoIncrement: false,
           });
         }
       });
@@ -33,7 +33,17 @@ const getDB = () => {
   });
 };
 
-export function addData(object, storeName) {
+export async function saveData(object, storeName) {
+  console.log("saving object from dao", object);
+  const objFromDb = await getDataById(object.id, storeName);
+  console.log("obj from db", objFromDb);
+  if (objFromDb && objFromDb.id) {
+    return updateData(storeName, object.id, object);
+  }
+  return addData(object, storeName);
+}
+
+function addData(object, storeName) {
   return new Promise((resolve, reject) => {
     getDB()
       .then((db) => {
@@ -53,40 +63,41 @@ export function addData(object, storeName) {
   });
 }
 
-export function updateData(storeName, id, updatedData) {
-  return new Promise((resolve, reject) => {
-    getDB()
-      .then((db) => {
-        const transaction = db.transaction([storeName], "readwrite");
+function updateData(storeName, id, obj) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("update request", id, obj);
+      const db = await getDB();
+      const transaction = db.transaction([storeName], "readwrite");
+      const objectStore = transaction.objectStore(storeName);
+      const getRequest = objectStore.get(id);
 
-        const objectStore = transaction.objectStore(storeName);
-        const getRequest = objectStore.get(id);
+      getRequest.onerror = function (event) {
+        reject(new Error(`Error getting object: ${event.target.errorCode}`));
+      };
 
-        getRequest.onerror = function (event) {
-          reject(new Error("Error getting object", event.target.errorCode));
+      getRequest.onsuccess = function (event) {
+        const data = event.target.result;
+
+        if (!data) {
+          reject(new Error(`Object with ID ${id} not found`));
+          return;
+        }
+
+        const updatedObject = Object.assign({}, data, obj);
+        const putRequest = objectStore.put(updatedObject);
+
+        putRequest.onerror = function (event) {
+          reject(new Error(`Error updating object: ${event.target.errorCode}`));
         };
 
-        getRequest.onsuccess = function (event) {
-          const data = event.target.result;
-
-          if (!data) {
-            reject(new Error(`Object with ID ${id} not found`));
-            return;
-          }
-
-          const updatedObject = { ...data, ...updatedData };
-          const putRequest = objectStore.put(updatedObject, id);
-
-          putRequest.onerror = function (event) {
-            reject(new Error("Error updating object", event.target.errorCode));
-          };
-
-          putRequest.onsuccess = function (event) {
-            resolve(updatedObject);
-          };
+        putRequest.onsuccess = function (event) {
+          resolve(updatedObject);
         };
-      })
-      .catch((error) => reject(error));
+      };
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -132,23 +143,25 @@ export function getAllData(storeName) {
   });
 }
 
-export function deleteData(storeName, id) {
+export function deleteData(storeName, idList) {
+  console.log("delete request", idList, Array.isArray(idList));
   return new Promise((resolve, reject) => {
     getDB()
       .then((db) => {
         const transaction = db.transaction([storeName], "readwrite");
-
         const objectStore = transaction.objectStore(storeName);
-        const deleteRequest = objectStore.delete(id);
+        const deleteRequests = idList.map((id) => objectStore.delete(id));
 
-        deleteRequest.onerror = function (event) {
-          reject("Error deleting object", event.target.errorCode);
-        };
-
-        deleteRequest.onsuccess = function (event) {
-          resolve(`Object with ID ${id} deleted`);
-        };
+        Promise.all(deleteRequests)
+          .then(() => {
+            resolve(
+              `Object(s) with ID(s) ${idList ? idList.join(", ") : ""} deleted`
+            );
+          })
+          .catch((error) => {
+            reject(`Error deleting object(s): ${error}`);
+          });
       })
-      .catch((error) => reject(error));
+      .catch((error) => reject(`Error getting database: ${error}`));
   });
 }

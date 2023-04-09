@@ -30,12 +30,13 @@ import {
   getProfitYOYGrowth,
   getRevenueYOYGrwoth,
 } from "./FundamentalCalculator.js";
-import { add, addData, save, stockStore } from "./StockDao";
+import { add, addData, save, saveData, stockStore } from "./StockDao";
 import {
   getAvgDividendYield,
   getCurrentDividendYield,
 } from "./FundamentalCalculator.js";
 import { storeName } from "./Constant.js";
+import { ServiceButton } from "./ServiceButton.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,8 +60,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddStockForm(props) {
-  console.log("form data in add stock form", props.formData);
-  const [formData, setFormData] = React.useState(props.formData);
+  const { formData } = props;
+
   const {
     register,
     handleSubmit,
@@ -82,18 +83,18 @@ export default function AddStockForm(props) {
     new Map().set(1, "")
   );
 
-  // useEffect(() => {
-  //   console.log("formd000", formData);
-  //   setYearlyDividend(new Map(formData.yearlyDividend));
-  // }, []);
+  useEffect(() => {
+    setYearlyDividend(new Map(formData.yearlyDividend));
+    setYearlyProfit(new Map(formData.yearlyProfit));
+    setYearlyRevenue(new Map(formData.yearlyRevenue));
+  }, [formData]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     register(name, { required: true, value });
   };
 
-  const saveData = (data) => {
-    console.log("Saveing data is loook like", data);
+  const save = (data) => {
     setLoading(true);
     const bookValue = getBookValue(data.totalAssets, data.totalLiabilities);
     const eps = getEps(data?.outstandingShare, data?.profit);
@@ -138,7 +139,7 @@ export default function AddStockForm(props) {
     const paidUpCapital = "";
 
     formData.sector = data.sector;
-    formData.symbol = data.symbol;
+    formData.id = data.id;
     formData.bookValue = bookValue;
     formData.eps = eps;
     formData.pe = pe;
@@ -174,15 +175,20 @@ export default function AddStockForm(props) {
     // formData.revenueYoYGrowth = revenueYoYGrowth;
 
     console.log("final form data--", formData);
-    addData(formData, stockStore)
+    console.log("regiser value", register);
+
+    saveData(formData, stockStore)
       .then(() => console.log("Data added successfully"))
       .catch((error) => console.error(error));
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
-  const handleOptionChange = (name) => (event, value) => {
-    console.log("name value", name, value);
-    setFormData({ ...formData, [name]: value });
-  };
+  // const handleOptionChange = (name) => (event, value) => {
+  //   console.log("name value", name, value);
+  //   setFormData({ ...formData, [name]: value });
+  // };
 
   const handleAddInput = () => {
     const newId = yearlyDividend.size + 1;
@@ -234,7 +240,7 @@ export default function AddStockForm(props) {
       <Typography variant="h4" component="h1" className={classes.title}>
         Add Stock
       </Typography>
-      <form onSubmit={handleSubmit(saveData)}>
+      <form onSubmit={handleSubmit(save)}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -280,15 +286,15 @@ export default function AddStockForm(props) {
               fullWidth
               className={classes.textField}
               label="Symbol"
-              name="symbol"
+              name="id"
               InputLabelProps={{
                 shrink: true,
               }}
               onChange={handleInputChange}
-              {...register("symbol", { required: true })}
-              error={errors.symbol ? true : false}
+              {...register("id", { required: true })}
+              error={errors.id ? true : false}
               helperText={
-                errors.symbol?.type === "required" && "Symbol is required"
+                errors.id?.type === "required" && "Symbol is required"
               }
             />
           </Grid>
@@ -366,16 +372,16 @@ export default function AddStockForm(props) {
               fullWidth
               className={classes.textField}
               label="Last Year Q4 price"
-              name="lastPrice"
+              name="lastYearPrice"
               inputProps={{ type: "number" }}
               InputLabelProps={{
                 shrink: true,
               }}
               onChange={handleInputChange}
-              {...register("lastPrice", { required: true })}
-              error={errors.lastPrice ? true : false}
+              {...register("lastYearPrice", { required: true })}
+              error={errors.lastYearPrice ? true : false}
               helperText={
-                errors.lastPrice?.type === "required" &&
+                errors.lastYearPrice?.type === "required" &&
                 "Last year price is required"
               }
             />
@@ -538,6 +544,7 @@ export default function AddStockForm(props) {
                   variant="outlined"
                   fullWidth
                   className={classes.dynamicField}
+                  inputProps={{ type: "number" }}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -579,6 +586,7 @@ export default function AddStockForm(props) {
                   variant="outlined"
                   fullWidth
                   className={classes.dynamicField}
+                  inputProps={{ type: "number" }}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -622,6 +630,7 @@ export default function AddStockForm(props) {
                   fullWidth
                   className={classes.dynamicField}
                   label={`${id} of 3 Year Revenue(Q4)`}
+                  inputProps={{ type: "number" }}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -656,17 +665,13 @@ export default function AddStockForm(props) {
 
           <Grid item xs={6}>
             <Stack direction="row" spacing={1}>
-              <LoadingButton
+              <ServiceButton
                 className={classes.button}
                 onClick={handleSubmit}
-                endIcon={<Save />}
-                loading={false}
-                loadingPosition="end"
-                variant="contained"
-                type="submit"
-              >
-                <span>Update</span>
-              </LoadingButton>
+                loading={loading}
+                name={formData.id ? "Update" : "Add"}
+                icon={<Save />}
+              />
               <Button variant="outlined" type="reset">
                 Reset
               </Button>

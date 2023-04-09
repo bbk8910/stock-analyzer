@@ -38,19 +38,11 @@ export default function StockTable(props) {
   const { stockMap, setFormData, formData } = props;
   const [dataList, setDataList] = React.useState([]);
 
-  const [selectionModel, setSelectionModel] = React.useState([]);
+  const [selectedIds, setSelectionModel] = React.useState([]);
 
   useEffect(() => {
-    const list = Object.entries(stockMap).map(([symbol, row], index) => {
-      const data = {
-        ...row,
-        symbol: symbol,
-        id: symbol,
-      };
-
-      return data;
-    });
-    setDataList(list);
+    console.log(stockMap);
+    setDataList(Array.from(stockMap));
   }, [stockMap]);
 
   const columns = [
@@ -164,10 +156,8 @@ export default function StockTable(props) {
 
         <IconButton
           onClick={() => {
-            const selectedIDs = new Set(selectionModel);
-            console.log("selected id", selectedIDs);
-            deleteData(stockStore, selectedIDs).then(() => {
-              setDataList((r) => r.filter((x) => !selectedIDs.has(x.id)));
+            deleteData(stockStore, selectedIds).then(() => {
+              setDataList((r) => r.filter((x) => !selectedIds.includes(x.id)));
             });
           }}
         >
@@ -187,31 +177,8 @@ export default function StockTable(props) {
     setOpen(false);
   };
 
-  function getListItem(data) {
-    let listItem = Object.entries(data)?.map(([key, value]) => (
-      <ListItem key={key}>
-        <ListItemText primary={key} secondary={value} />
-      </ListItem>
-    ));
-    return listItem;
-  }
-
   return (
     <Box style={{ height: 400, width: "100%" }} component={Paper}>
-      {/* <Button
-        variant="contained"
-        color="secondary"
-        disabled={!selectionModel.selectedIds.length}
-        onClick={() => {
-          const newRows = dataList.filter(
-            (row) => !selectionModel.selectedIds.includes(row.id)
-          );
-          setDataList(newRows);
-          selectionModel.setDeselectedIds(selectionModel.selectedIds);
-        }}
-      >
-        Delete Selected Rows
-      </Button> */}
       <DataGrid
         rows={[...dataList]}
         columns={columns}
