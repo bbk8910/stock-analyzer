@@ -1,16 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Paper,
-  Box,
-  Button,
-  IconButton,
-  Dialog,
-  List,
-  ListItem,
-  ListItemText,
-  DialogContentText,
-  DialogTitle,
-} from "@material-ui/core";
+import { Paper, Box, Button, IconButton } from "@material-ui/core";
 import {
   getEpsStatus,
   getGNPercentStatus,
@@ -29,10 +18,9 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
-import { deleteData, deleteStock, stockStore } from "./StockDao";
+import { deleteData, stockStore } from "./StockDao";
 import { Stack } from "@mui/material";
 import { StockDetail } from "./StockDetail";
-import { storeName } from "./Constant";
 
 export default function StockTable(props) {
   const { stockMap, setFormData, formData } = props;
@@ -46,7 +34,7 @@ export default function StockTable(props) {
   }, [stockMap]);
 
   const columns = [
-    { field: "symbol", headerName: "Symbol" },
+    { field: "id", headerName: "Symbol" },
     { field: "sector", headerName: "Sector" },
     {
       field: "eps",
@@ -132,12 +120,7 @@ export default function StockTable(props) {
             color="primary"
             startIcon={<Edit />}
             onClick={() => {
-              const data = new Map(Object.entries(stockMap || [])).get(
-                params.row.symbol
-              );
-              setFormData(data);
-
-              console.log("paraa", data);
+              setFormData(params.row || {});
             }}
           >
             Edit
