@@ -1,3 +1,16 @@
+import { OVER_VLAUED, UNDER_VALUED } from "./Constant";
+import {
+  getCurrentDividendYieldStatus,
+  getEpsStatus,
+  getGNPercentStatus,
+  getPBStatus,
+  getPEGStatus,
+  getPEStatus,
+  getROAStatus,
+  getROEStatus,
+  getYearToYearGrowthStatus,
+} from "./Report";
+
 const DB_NAME = "stockDB";
 const DB_VERSION = 1;
 
@@ -34,9 +47,53 @@ const getDB = () => {
 };
 
 export async function saveData(object, storeName) {
-  console.log("saving object from dao", object);
   const objFromDb = await getDataById(object.id, storeName);
-  console.log("obj from db", objFromDb);
+
+  const peStatus = getPEStatus(object.pe).status;
+  const pbStatus = getPBStatus(object.pb).status;
+  const pegStatus = getPEGStatus(object.peg).status;
+  const roeStatus = getROEStatus(object.roe, object.sector).status;
+  const roaStatus = getROAStatus(object.roa).status;
+  const devidendYieldStatus = getCurrentDividendYieldStatus(
+    object.currentDividendYield,
+    object.sector
+  ).status;
+  const yoyGrowth = getYearToYearGrowthStatus(object.yearToYearGrowth).status;
+  const gnAboveStatus = getGNPercentStatus(object.gnAbove).status;
+
+  console.log(
+    "status----->",
+    peStatus,
+    pbStatus,
+    pegStatus,
+    roeStatus,
+    roaStatus,
+    devidendYieldStatus,
+    yoyGrowth,
+    gnAboveStatus
+  );
+
+  const statusList = [
+    peStatus,
+    pbStatus,
+    pegStatus,
+    roeStatus,
+    roaStatus,
+    devidendYieldStatus,
+    yoyGrowth,
+    gnAboveStatus,
+  ];
+
+  console.log("status list", statusList);
+
+  const underValuedCount = statusList.filter(
+    (data) => data === UNDER_VALUED
+  ).length;
+  console.log("under value count", underValuedCount);
+
+  const isBlueChip = underValuedCount >= 6;
+  object.isBlueChip = isBlueChip;
+
   if (objFromDb && objFromDb.id) {
     return updateData(storeName, object.id, object);
   }
@@ -66,7 +123,6 @@ function addData(object, storeName) {
 function updateData(storeName, id, obj) {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("update request", id, obj);
       const db = await getDB();
       const transaction = db.transaction([storeName], "readwrite");
       const objectStore = transaction.objectStore(storeName);
@@ -144,7 +200,6 @@ export function getAllData(storeName) {
 }
 
 export function deleteData(storeName, idList) {
-  console.log("delete request", idList, Array.isArray(idList));
   return new Promise((resolve, reject) => {
     getDB()
       .then((db) => {

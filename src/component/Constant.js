@@ -29,3 +29,6 @@ export const SECTOR_LIST = [
   LIFE_INSURENCE,
   OTHERS,
 ];
+
+export const GROWTH = "GROWTH";
+export const DECRESE = "DECRESE";

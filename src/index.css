@@ -26,6 +26,13 @@ code {
   /* align-items: center; */
 }
 
+.tab-wrapper {
+  max-width: 1500px;
+  margin: auto;
+  padding: 20px;
+  /* align-items: center; */
+}
+
 .stock-form {
   max-width: 35%;
 }

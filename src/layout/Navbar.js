@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import { Link } from "react-router-dom";
 const pages = [];
@@ -48,7 +49,7 @@ function Navbar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon
+          <TrendingUpIcon
             sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
             onClick={null}
           />
@@ -62,12 +63,12 @@ function Navbar() {
               display: { xs: "none", md: "flex" },
               fontFamily: "monospace",
               fontWeight: 700,
-              letterSpacing: ".3rem",
+              letterSpacing: "0.3rem",
               color: "inherit",
               textDecoration: "none",
             }}
           >
-            CONSULTANT CMS
+            STOCK ANALYZER
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>

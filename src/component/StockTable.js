@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import { Paper, Box, Button, IconButton } from "@material-ui/core";
 import {
+  getCurrentDividendYieldStatus,
   getEpsStatus,
   getGNPercentStatus,
   getPBStatus,
   getPEGStatus,
   getPEStatus,
+  getPriceGrowthStatus,
   getROAStatus,
   getROEStatus,
+  getStatusText,
   getUpDown,
 } from "./Report";
 import {
@@ -21,6 +24,7 @@ import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
 import { deleteData, stockStore } from "./StockDao";
 import { Stack } from "@mui/material";
 import { StockDetail } from "./StockDetail";
+import { getCurrentDividendYield } from "./FundamentalCalculator";
 
 export default function StockTable(props) {
   const { stockMap, setFormData, formData } = props;
@@ -29,8 +33,7 @@ export default function StockTable(props) {
   const [selectedIds, setSelectionModel] = React.useState([]);
 
   useEffect(() => {
-    console.log(stockMap);
-    setDataList(Array.from(stockMap));
+    setDataList(Array.from(stockMap || []));
   }, [stockMap]);
 
   const columns = [
@@ -39,43 +42,58 @@ export default function StockTable(props) {
     {
       field: "eps",
       headerName: "EPS",
-      renderCell: (params) => getEpsStatus(params.row.eps),
+      renderCell: (params) => getStatusText(getEpsStatus(params.row.eps)),
     },
     {
       field: "pe",
       headerName: "P/E",
-      renderCell: (params) => getPEStatus(params.row.pe),
+      renderCell: (params) => getStatusText(getPEStatus(params.row.pe)),
     },
     {
       field: "pb",
       headerName: "PB",
-      renderCell: (params) => getPBStatus(params.row.pb),
+      renderCell: (params) => getStatusText(getPBStatus(params.row.pb)),
     },
     {
       field: "peg",
       headerName: "PEG",
-      renderCell: (params) => getPEGStatus(params.row.peg),
+      renderCell: (params) => getStatusText(getPEGStatus(params.row.peg)),
     },
     {
       field: "roe",
       headerName: "ROE",
-      renderCell: (params) => getROEStatus(params.row.roe),
+      renderCell: (params) =>
+        getStatusText(getROEStatus(params.row.roe, params.row.sector)),
     },
     {
       field: "roa",
       headerName: "ROA",
-      renderCell: (params) => getROAStatus(params.row.roa),
+      renderCell: (params) => getStatusText(getROAStatus(params.row.roa)),
     },
     {
       field: "gnAbove",
       headerName: "GN % Above",
-      renderCell: (params) => getGNPercentStatus(params.row.gnAbove),
+      renderCell: (params) =>
+        getStatusText(getGNPercentStatus(params.row.gnAbove)),
     },
 
     {
-      field: "priceYoYGrowth",
-      headerName: "PriceYOYGrowth",
-      renderCell: (params) => getUpDown(params.row.priceYoYGrowth),
+      field: "currentDividendYield",
+      headerName: "DividendYield",
+      renderCell: (params) =>
+        getStatusText(
+          getCurrentDividendYieldStatus(
+            params.row?.currentDividendYield,
+            params.row.sector
+          )
+        ),
+    },
+
+    {
+      field: "yearToYearGrowth",
+      headerName: "YOYGrowth",
+      renderCell: (params) =>
+        getPriceGrowthStatus(params.row?.yearToYearGrowth[0]),
     },
 
     {
@@ -102,13 +120,8 @@ export default function StockTable(props) {
             color="primary"
             startIcon={<ViewAgenda />}
             onClick={() => {
-              const data = new Map(Object.entries(stockMap)).get(
-                params.row.symbol
-              );
-              setFormData(data);
+              setFormData(params.row || {});
               handleClickOpen();
-
-              console.log("paraa", data);
             }}
           >
             view
@@ -144,7 +157,9 @@ export default function StockTable(props) {
             });
           }}
         >
-          <DeleteForever />
+          <DeleteForever
+            style={{ color: selectedIds.length ? "red" : "grey" }}
+          />
         </IconButton>
       </GridToolbarContainer>
     );

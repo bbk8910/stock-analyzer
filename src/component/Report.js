@@ -1,9 +1,14 @@
 import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "./Constant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import { hasGrowth } from "./FundamentalCalculator";
+import { getPriceYOYGrowth, hasGrowth } from "./FundamentalCalculator";
 
-const getStatusText = (status, value) => {
+export const getStatusText = (obj) => {
+  if (!obj) {
+    return getDefaultStatus();
+  }
+  const status = obj?.status;
+  const value = obj?.value;
   return status === UNDER_VALUED ? (
     <p style={{ color: "green" }}>{value}</p>
   ) : (
@@ -12,8 +17,23 @@ const getStatusText = (status, value) => {
 };
 
 export const getUpDown = (value) => {
+  if (!value) {
+    return getDefaultStatus();
+  }
   const growth = hasGrowth(value);
   return growth ? (
+    <TrendingUpIcon style={{ color: "green" }} />
+  ) : (
+    <TrendingDownIcon style={{ color: "red" }} />
+  );
+};
+
+export const getPriceGrowthStatus = (growth) => {
+  if (!growth) {
+    return getDefaultStatus();
+  }
+
+  return growth > 10 ? (
     <TrendingUpIcon style={{ color: "green" }} />
   ) : (
     <TrendingDownIcon style={{ color: "red" }} />
@@ -30,9 +50,9 @@ export function getEpsStatus(eps) {
   }
   switch (true) {
     case eps >= 30:
-      return getStatusText(UNDER_VALUED, eps);
+      return { status: UNDER_VALUED, value: eps };
     default:
-      return getStatusText(OVER_VLAUED, eps);
+      return { status: OVER_VLAUED, value: eps };
   }
 }
 
@@ -40,61 +60,46 @@ export function getPEStatus(pe) {
   if (!pe) {
     return getDefaultStatus();
   }
-  switch (true) {
-    case pe <= 30 && pe >= 10:
-      return getStatusText(UNDER_VALUED, pe);
-    default:
-      return getStatusText(OVER_VLAUED, pe);
-  }
+  return pe <= 30 && pe >= 10
+    ? { status: UNDER_VALUED, value: pe }
+    : { status: OVER_VLAUED, value: pe };
 }
 
 export function getPBStatus(pb) {
   if (!pb) {
     return getDefaultStatus();
   }
-  switch (true) {
-    case pb <= 5:
-      return getStatusText(UNDER_VALUED, pb);
-
-    default:
-      return getStatusText(OVER_VLAUED, pb);
-  }
+  return pb <= 5
+    ? { status: UNDER_VALUED, value: pb }
+    : { status: OVER_VLAUED, value: pb };
 }
 
 export function getBookValueStatus(bookValue) {
   if (!bookValue) {
     return getDefaultStatus();
   }
-  switch (true) {
-    case bookValue >= 100:
-      return getStatusText(UNDER_VALUED, bookValue);
-    default:
-      return getStatusText(OVER_VLAUED, bookValue);
-  }
+  return bookValue >= 100
+    ? { status: UNDER_VALUED, value: bookValue }
+    : { status: OVER_VLAUED, value: bookValue };
 }
 
 export function getPEGStatus(peg) {
   if (!peg) {
     return getDefaultStatus();
   }
-  if (peg <= 1) {
-    return getStatusText(UNDER_VALUED, peg);
-  }
-  return getStatusText(OVER_VLAUED, peg);
+  return peg <= 1
+    ? { status: UNDER_VALUED, value: peg }
+    : { status: OVER_VLAUED, value: peg };
 }
 
 //note ROE always greter than fixed deposite interest
 export function getROEStatus(roe, sector) {
-  if (!roe) {
-    return getDefaultStatus();
-  }
-
   if (sector === sectorObj.BANK || sector === sectorObj.MICRO_FINANCE) {
-    if (roe > 15) return getStatusText(UNDER_VALUED, roe);
+    if (roe > 15) return { status: UNDER_VALUED, value: roe };
   }
   return roe > 20
-    ? getStatusText(UNDER_VALUED)
-    : getStatusText(OVER_VLAUED, roe);
+    ? { status: UNDER_VALUED, value: roe }
+    : { status: OVER_VLAUED, value: roe };
 }
 
 export function getROAStatus(roa) {
@@ -102,8 +107,8 @@ export function getROAStatus(roa) {
     return getDefaultStatus();
   }
   return roa > 1
-    ? getStatusText(UNDER_VALUED, roa)
-    : getStatusText(OVER_VLAUED, roa);
+    ? { status: UNDER_VALUED, value: roa }
+    : { status: OVER_VLAUED, value: roa };
 }
 
 export function getGNPercentStatus(gn) {
@@ -111,8 +116,14 @@ export function getGNPercentStatus(gn) {
     return getDefaultStatus();
   }
   return gn < 25
-    ? getStatusText(UNDER_VALUED, gn)
-    : getStatusText(OVER_VLAUED, gn);
+    ? { status: UNDER_VALUED, value: gn }
+    : { status: OVER_VLAUED, value: gn };
+}
+
+export function getYearToYearGrowthStatus(lastYearLTP, currentLTP) {
+  return getPriceYOYGrowth(lastYearLTP, currentLTP) >= 10
+    ? { status: UNDER_VALUED, value: currentLTP }
+    : { status: OVER_VLAUED, value: currentLTP };
 }
 
 export function getAvgDividendStatus(value, sector) {
@@ -121,8 +132,8 @@ export function getAvgDividendStatus(value, sector) {
   }
   if (sector === sectorObj.BANK) {
     return value > 15.99
-      ? getStatusText(UNDER_VALUED, value)
-      : getStatusText(OVER_VLAUED, value);
+      ? { status: UNDER_VALUED, value: value }
+      : { status: OVER_VLAUED, value: value };
   } else if (sector === sector.LIFE_INSURENCE) {
   }
 }
@@ -133,8 +144,8 @@ export function getAvgDividendYieldStatus(value, sector) {
   }
   if (sector === sectorObj.BANK) {
     return value > 3.91
-      ? getStatusText(UNDER_VALUED)
-      : getStatusText(OVER_VLAUED);
+      ? { status: UNDER_VALUED, value: value }
+      : { status: OVER_VLAUED, value: value };
   } else if (sector == sectorObj.LIFE_INSURENCE) {
   }
 }
@@ -145,7 +156,7 @@ export function getCurrentDividendYieldStatus(value, sector) {
   }
   if (sector === sectorObj.BANK) {
     return value > 3.46
-      ? getStatusText(UNDER_VALUED)
-      : getStatusText(OVER_VLAUED);
+      ? { status: UNDER_VALUED, value: value }
+      : { status: OVER_VLAUED, value: value };
   }
 }

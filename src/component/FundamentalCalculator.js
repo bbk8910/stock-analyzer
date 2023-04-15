@@ -33,6 +33,7 @@ export function getAnnualizedROA(netProfit, totalAssets) {
 }
 
 export function getPEG(pe, epsGrowth) {
+  console.log("pe epsgrowth", pe, epsGrowth);
   return (pe / epsGrowth).toFixed(2);
 }
 
@@ -46,15 +47,8 @@ export function getHigerThanGNInPercentage(eps, bookValue, currentPrice) {
 }
 
 export function getGN(eps, bookValue) {
-  return Number(Math.sqrt(22.5 * eps * bookValue).toFixed(2));
+  return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
 }
-
-// export function getYearToYearGrowth(
-//   lastYeaQFourClosingPrice,
-//   currentQarterClosingPrice
-// ) {
-//   return Math.sqrt(22.5 * eps * bookValue).toFixed(2);
-// }
 
 export function getAvgDividendYield(history, currentPrice) {
   let array = Array.from(history.values());
@@ -62,9 +56,16 @@ export function getAvgDividendYield(history, currentPrice) {
   return (avarageDividend / currentPrice) * 100;
 }
 
-export function getCurrentDividendYield(history, currentPrice) {
-  let lastYearDividend = Number(history.get(1));
-  return (lastYearDividend / currentPrice) * 100;
+export function calculateDividendYield(
+  annualDividendPercentageList,
+  marketPrice
+) {
+  const currentYearDividendInPercent = Number(
+    annualDividendPercentageList.get(1)
+  );
+  const annualDividend = (currentYearDividendInPercent / 100) * marketPrice;
+  const dividendYield = (annualDividend / marketPrice) * 100;
+  return dividendYield.toFixed(2);
 }
 
 export function getPriceYOYGrowth(lastYearPrice, currentPrice) {

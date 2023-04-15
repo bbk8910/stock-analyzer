@@ -7,6 +7,7 @@ import {
   makeStyles,
   IconButton,
   Box,
+  Snackbar,
 } from "@material-ui/core";
 
 import { Cancel, PlusOneSharp, Save } from "@material-ui/icons";
@@ -16,6 +17,7 @@ import { Stack } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
 import {
+  calculateDividendYield,
   getAnnualizedROA,
   getAnnualizedROE,
   getBookValue,
@@ -29,14 +31,15 @@ import {
   getPriceYOYGrowth,
   getProfitYOYGrowth,
   getRevenueYOYGrwoth,
-} from "./FundamentalCalculator.js";
-import { add, addData, save, saveData, stockStore } from "./StockDao";
+} from "../FundamentalCalculator.js";
+import { add, addData, save, saveData, stockStore } from "../StockDao";
 import {
   getAvgDividendYield,
   getCurrentDividendYield,
-} from "./FundamentalCalculator.js";
-import { storeName } from "./Constant.js";
-import { ServiceButton } from "./ServiceButton.js";
+} from "../FundamentalCalculator.js";
+import { storeName } from "../Constant.js";
+import { ServiceButton } from "../ServiceButton.js";
+import MySnackBar from "../SnackBar.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(0),
   },
   dynamicField: {
-    marginBottom: theme.spacing(1),
+    marginBottom: theme.spacing(2),
   },
   button: {
     marginRight: theme.spacing(2),
@@ -59,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddStockForm(props) {
+export default function AddRawStockDataForm(props) {
   const { formData } = props;
 
   const {
@@ -82,11 +85,12 @@ export default function AddStockForm(props) {
   const [yearlyRevenue, setYearlyRevenue] = React.useState(
     new Map().set(1, "")
   );
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
   useEffect(() => {
-    setYearlyDividend(new Map(formData.yearlyDividend));
-    setYearlyProfit(new Map(formData.yearlyProfit));
-    setYearlyRevenue(new Map(formData.yearlyRevenue));
+    setYearlyDividend(new Map(formData.yearlyDividend || yearlyDividend));
+    setYearlyProfit(new Map(formData.yearlyProfit || yearlyProfit));
+    setYearlyRevenue(new Map(formData.yearlyRevenue || yearlyRevenue));
   }, [formData]);
 
   const handleInputChange = (event) => {
@@ -99,11 +103,10 @@ export default function AddStockForm(props) {
     const bookValue = getBookValue(data.totalAssets, data.totalLiabilities);
     const eps = getEps(data?.outstandingShare, data?.profit);
     const pe = getPERatio(data.currentPrice, eps);
+    const epsGrowth =
+      eps - getEps(data.lastYearOutstandngShare, data.lastYearProfit);
 
-    const peg = getPEG(
-      pe,
-      eps - getEps(data.lastYearOutstandngShare, data.lastYearProfit)
-    );
+    const peg = getPEG(pe, epsGrowth);
 
     const pb = getPB(data.currentPrice, bookValue);
     const roe = getAnnualizedROE(data.profit, data.outstandingShare);
@@ -119,11 +122,11 @@ export default function AddStockForm(props) {
     const yearToYearGrowth =
       ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
 
-    const avgDividendYield = getAvgDividendYield(
+    const avgDividendYield = calculateDividendYield(
       yearlyDividend,
       data.currentPrice
     );
-    const currentDividendYield = getCurrentDividendYield(
+    const currentDividendYield = calculateDividendYield(
       yearlyDividend,
       data.currentPrice
     );
@@ -137,6 +140,8 @@ export default function AddStockForm(props) {
 
     const payoutRatio = "";
     const paidUpCapital = "";
+    const profit = yearlyProfit.get(1);
+    const lastYearProfit = yearlyProfit.get(2);
 
     formData.sector = data.sector;
     formData.id = data.id;
@@ -155,8 +160,8 @@ export default function AddStockForm(props) {
     formData.payoutRatio = payoutRatio;
     formData.outstandingShare = data.outstandingShare;
     formData.lastYearOutstandngShare = data.lastYearOutstandngShare;
-    formData.profit = data.profit;
-    formData.lastYearProfit = data.lastYearProfit;
+    formData.profit = profit;
+    formData.lastYearProfit = lastYearProfit;
     formData.currentPrice = data.currentPrice;
     formData.lastYearPrice = data.lastYearPrice;
     formData.mktCapitalization = data.mktCapitalization;
@@ -174,11 +179,12 @@ export default function AddStockForm(props) {
     // formData.profitYoYGrowth = profitYoYGrowth;
     // formData.revenueYoYGrowth = revenueYoYGrowth;
 
-    console.log("final form data--", formData);
     console.log("regiser value", register);
 
     saveData(formData, stockStore)
-      .then(() => console.log("Data added successfully"))
+      .then(() => {
+        setOpenSnackBar(true);
+      })
       .catch((error) => console.error(error));
     setTimeout(() => {
       setLoading(false);
@@ -427,7 +433,7 @@ export default function AddStockForm(props) {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               id="formatted-numberformat-input"
               variant="outlined"
@@ -446,9 +452,9 @@ export default function AddStockForm(props) {
                 errors.profit?.type === "required" && "Profit value is required"
               }
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               id="formatted-numberformat-input"
               variant="outlined"
@@ -468,7 +474,7 @@ export default function AddStockForm(props) {
                 "Last year Profit value is required"
               }
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sm={6}>
             <TextField
@@ -669,7 +675,7 @@ export default function AddStockForm(props) {
                 className={classes.button}
                 onClick={handleSubmit}
                 loading={loading}
-                name={formData.id ? "Update" : "Add"}
+                name={"save"}
                 icon={<Save />}
               />
               <Button variant="outlined" type="reset">
@@ -677,6 +683,12 @@ export default function AddStockForm(props) {
               </Button>
             </Stack>
           </Grid>
+          <MySnackBar
+            open={openSnackBar}
+            setOpen={setOpenSnackBar}
+            message={"Success"}
+            severity={"success"}
+          />
         </Grid>
       </form>
     </Box>
