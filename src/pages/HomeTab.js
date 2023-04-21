@@ -4,8 +4,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import HomePage from "./HomePage";
-import StockData from "./StockData";
+import HomePage from "./RawStockPage";
+import StockData from "./StockPage";
 import BlueChip from "./BlueChip";
 import { getCurrentTab, saveTab } from "../dao/StockDao";
 
