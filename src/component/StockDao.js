@@ -57,7 +57,7 @@ export async function saveData(object, storeName) {
   const devidendYieldStatus = getCurrentDividendYieldStatus(
     object.currentDividendYield,
     object.sector
-  ).status;
+  )?.status;
   const yoyGrowth = getYearToYearGrowthStatus(object.yearToYearGrowth).status;
   const gnAboveStatus = getGNPercentStatus(object.gnAbove).status;
 

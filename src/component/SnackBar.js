@@ -8,20 +8,28 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function MySnackBar(props) {
-  const { open, setOpen, message, severity } = props;
+  const { snackBarController, setSnackBarController } = props;
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setSnackBarController((prevState) => ({ ...prevState, open: false }));
   };
 
   return (
-    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
-        {message}
+    <Snackbar
+      open={snackBarController.open}
+      autoHideDuration={6000}
+      onClose={handleClose}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={snackBarController.severity}
+        sx={{ width: "100%" }}
+      >
+        {snackBarController.message}
       </Alert>
     </Snackbar>
   );

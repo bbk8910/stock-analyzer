@@ -12,7 +12,7 @@ import {
 
 import { Cancel, PlusOneSharp, Save } from "@material-ui/icons";
 import { LoadingButton } from "@mui/lab";
-import { Stack } from "@mui/material";
+import { Autocomplete, Stack } from "@mui/material";
 
 import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
@@ -37,7 +37,7 @@ import {
   getAvgDividendYield,
   getCurrentDividendYield,
 } from "../FundamentalCalculator.js";
-import { storeName } from "../Constant.js";
+import { SECTOR_LIST, storeName } from "../Constant.js";
 import { ServiceButton } from "../ServiceButton.js";
 import MySnackBar from "../SnackBar.js";
 
@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddRawStockDataForm(props) {
-  const { formData } = props;
+  const { formData, setFormData } = props;
 
   const {
     register,
@@ -85,7 +85,11 @@ export default function AddRawStockDataForm(props) {
   const [yearlyRevenue, setYearlyRevenue] = React.useState(
     new Map().set(1, "")
   );
-  const [openSnackBar, setOpenSnackBar] = React.useState(false);
+  const [snackBarController, setSnackBarController] = React.useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     setYearlyDividend(new Map(formData.yearlyDividend || yearlyDividend));
@@ -183,13 +187,31 @@ export default function AddRawStockDataForm(props) {
 
     saveData(formData, stockStore)
       .then(() => {
-        setOpenSnackBar(true);
+        handleSuccessSnackBar("Success");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => handleErrorSnackBar("Error Occurred"));
     setTimeout(() => {
       setLoading(false);
     }, 2000);
   };
+
+  function handleSuccessSnackBar(message) {
+    setSnackBarController((prevState) => ({
+      ...prevState,
+      open: true,
+      message: message,
+      severity: "success",
+    }));
+  }
+
+  function handleErrorSnackBar(message) {
+    setSnackBarController((prevState) => ({
+      ...prevState,
+      open: true,
+      message: message,
+      severity: "error",
+    }));
+  }
 
   // const handleOptionChange = (name) => (event, value) => {
   //   console.log("name value", name, value);
@@ -249,41 +271,31 @@ export default function AddRawStockDataForm(props) {
       <form onSubmit={handleSubmit(save)}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
-              id="formatted-numberformat-input"
-              variant="outlined"
-              fullWidth
-              className={classes.textField}
-              label="Sector"
-              name="sector"
-              onChange={handleInputChange}
-              {...register("sector", { required: true })}
-              error={errors.sector ? true : false}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              helperText={
-                errors.sector?.type === "required" && "Sector is required"
-              }
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              options={SECTOR_LIST}
+              renderInput={(params) => (
+                <TextField
+                  id="formatted-numberformat-input"
+                  {...params}
+                  variant="outlined"
+                  fullWidth
+                  className={classes.textField}
+                  label="Sector"
+                  name="sector"
+                  onChange={handleInputChange}
+                  {...register("sector", { required: true })}
+                  error={errors.sector ? true : false}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  helperText={
+                    errors.sector?.type === "required" && "Sector is required"
+                  }
+                />
+              )}
             />
-            {/* <FormControl fullWidth>
-              <InputLabel style={{ marginLeft: 15 }} focused>
-                Sector
-              </InputLabel>
-              <Select
-                labelId="demo-multiple-name-label"
-                id="demo-multiple-name"
-                name="sector"
-                onChange={handleInputChange}
-                input={<OutlinedInput />}
-              >
-                {SECTOR_LIST.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -684,10 +696,8 @@ export default function AddRawStockDataForm(props) {
             </Stack>
           </Grid>
           <MySnackBar
-            open={openSnackBar}
-            setOpen={setOpenSnackBar}
-            message={"Success"}
-            severity={"success"}
+            snackBarController={snackBarController}
+            setSnackBarController={setSnackBarController}
           />
         </Grid>
       </form>

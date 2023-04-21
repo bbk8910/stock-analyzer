@@ -176,7 +176,7 @@ export default function StockTable(props) {
   };
 
   return (
-    <Box style={{ height: 400, width: "100%" }} component={Paper}>
+    <Box style={{ height: 600, width: "100%" }} component={Paper}>
       <DataGrid
         rows={[...dataList]}
         columns={columns}

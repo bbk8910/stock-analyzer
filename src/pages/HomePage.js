@@ -22,7 +22,7 @@ export default function HomePage(prosp) {
   return (
     <Box sx={{ width: "100%" }} className="page-wrapper">
       <div className="stock-form">
-        <AddStockForm formData={formData} />
+        <AddStockForm formData={formData} setFormData={setFormData} />
       </div>
       <div className="stock-table">
         <StockTable
