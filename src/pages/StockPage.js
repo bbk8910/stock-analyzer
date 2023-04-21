@@ -2,7 +2,7 @@ import { Box } from "@material-ui/core";
 import React, { useEffect } from "react";
 import AddStockDataForm from "../component/form/AddDataForm";
 import AddStockForm from "../component/form/AddRawStockDataForm";
-import { getAllData, getAllStock, stockStore } from "../component/StockDao";
+import { getAllData, getAllStock, stockStore } from "../dao/StockDao";
 import StockTable from "../component/StockTable";
 
 export default function StockData(prosp) {
@@ -30,6 +30,7 @@ export default function StockData(prosp) {
           stockMap={stockMap}
           setFormData={setFormData}
           formData={formData}
+          action={true}
         />
       </div>
     </Box>

@@ -6,8 +6,8 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import HomePage from "./HomePage";
 import StockData from "./StockData";
-import StockTable from "../component/StockTable";
 import BlueChip from "./BlueChip";
+import { getCurrentTab, saveTab } from "../dao/StockDao";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -37,9 +37,16 @@ TabPanel.propTypes = {
 
 export default function HomeTab(props) {
   const [value, setValue] = React.useState(1);
+  const currentTab = Number(getCurrentTab()) || 1;
+
+  React.useEffect(() => {
+    console.log("tab value", currentTab);
+    setValue(currentTab);
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    saveTab(newValue);
   };
 
   return (

@@ -7,45 +7,26 @@ import {
   makeStyles,
   IconButton,
   Box,
-  Snackbar,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
 } from "@material-ui/core";
 
 import { Cancel, PlusOneSharp, Save } from "@material-ui/icons";
-import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Stack } from "@mui/material";
 
 import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
 import {
   calculateDividendYield,
-  getAnnualizedROA,
-  getAnnualizedROE,
-  getBookValue,
+  getAvgDividendYield,
   getDebtToEquity,
-  getEps,
-  getGN,
   getHigerThanGNInPercentage,
   getPB,
-  getPEG,
   getPERatio,
   getPriceYOYGrowth,
-  getProfitYOYGrowth,
-  getRevenueYOYGrwoth,
-} from "../FundamentalCalculator.js";
-import { add, addData, save, saveData, stockStore } from "../StockDao";
-import {
-  getAvgDividendYield,
-  getCurrentDividendYield,
-} from "../FundamentalCalculator.js";
-import { SECTOR_LIST, storeName } from "../Constant.js";
+} from "../../service/FundamentalCalculator.js";
+import { saveData, stockStore } from "../../dao/StockDao";
+import { SECTOR_LIST } from "../../constant/Constant.js";
 import { ServiceButton } from "../ServiceButton.js";
 import MySnackBar from "../SnackBar.js";
-import { CurrencyYen } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -137,7 +118,7 @@ export default function AddStockDataForm(props) {
 
     const debtToEquity = getDebtToEquity(data.totalDebt, data.outstandingShare);
 
-    const avgDividendYield = calculateDividendYield(
+    const avgDividendYield = getAvgDividendYield(
       yearlyDividend,
       data.currentPrice
     );
@@ -177,7 +158,7 @@ export default function AddStockDataForm(props) {
       });
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1000);
   };
 
   function handleSuccessSnackBar(message) {
@@ -224,15 +205,13 @@ export default function AddStockDataForm(props) {
         Add Stock Data
       </Typography>
       <form onSubmit={handleSubmit(save)}>
-        <Grid container spacing={2}>
+        <Grid xs={12} container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Autocomplete
               disablePortal
               id="combo-box-demo"
               name="sector"
               options={SECTOR_LIST}
-              // onChange={handleInputChange}
-              // {...register("sector", { required: true })}
               renderInput={(params) => (
                 <TextField
                   id="formatted-numberformat-input"

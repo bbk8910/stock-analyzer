@@ -1,4 +1,8 @@
-import { OVER_VLAUED, UNDER_VALUED } from "./Constant";
+import {
+  CURRENT_TAB_KEY,
+  OVER_VLAUED,
+  UNDER_VALUED,
+} from "../constant/Constant";
 import {
   getCurrentDividendYieldStatus,
   getEpsStatus,
@@ -9,7 +13,7 @@ import {
   getROAStatus,
   getROEStatus,
   getYearToYearGrowthStatus,
-} from "./Report";
+} from "../service/Report";
 
 const DB_NAME = "stockDB";
 const DB_VERSION = 1;
@@ -91,7 +95,7 @@ export async function saveData(object, storeName) {
   ).length;
   console.log("under value count", underValuedCount);
 
-  const isBlueChip = underValuedCount >= 6;
+  const isBlueChip = underValuedCount >= 5;
   object.isBlueChip = isBlueChip;
 
   if (objFromDb && objFromDb.id) {
@@ -220,3 +224,11 @@ export function deleteData(storeName, idList) {
       .catch((error) => reject(`Error getting database: ${error}`));
   });
 }
+
+export const saveTab = (value) => {
+  localStorage.setItem(CURRENT_TAB_KEY, value);
+};
+
+export const getCurrentTab = () => {
+  return localStorage.getItem(CURRENT_TAB_KEY);
+};

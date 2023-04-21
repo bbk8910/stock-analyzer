@@ -32,3 +32,4 @@ export const SECTOR_LIST = [
 
 export const GROWTH = "GROWTH";
 export const DECRESE = "DECRESE";
+export const CURRENT_TAB_KEY = "currentTab";

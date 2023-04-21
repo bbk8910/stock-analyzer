@@ -7,11 +7,9 @@ import {
   makeStyles,
   IconButton,
   Box,
-  Snackbar,
 } from "@material-ui/core";
 
 import { Cancel, PlusOneSharp, Save } from "@material-ui/icons";
-import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Stack } from "@mui/material";
 
 import { useForm } from "react-hook-form";
@@ -28,16 +26,9 @@ import {
   getPB,
   getPEG,
   getPERatio,
-  getPriceYOYGrowth,
-  getProfitYOYGrowth,
-  getRevenueYOYGrwoth,
-} from "../FundamentalCalculator.js";
-import { add, addData, save, saveData, stockStore } from "../StockDao";
-import {
-  getAvgDividendYield,
-  getCurrentDividendYield,
-} from "../FundamentalCalculator.js";
-import { SECTOR_LIST, storeName } from "../Constant.js";
+} from "../../service/FundamentalCalculator.js";
+import { saveData, stockStore } from "../../dao/StockDao";
+import { SECTOR_LIST } from "../../constant/Constant.js";
 import { ServiceButton } from "../ServiceButton.js";
 import MySnackBar from "../SnackBar.js";
 
@@ -135,13 +126,6 @@ export default function AddRawStockDataForm(props) {
       data.currentPrice
     );
 
-    // const revenueYoYGrowth = getRevenueYOYGrwoth(yearlyRevenue);
-    // const profitYoYGrowth = getProfitYOYGrowth(yearlyProfit);
-    // const priceYoYGrowth = getPriceYOYGrowth(
-    //   data.lastYearPrice,
-    //   data.currentPrice
-    // );
-
     const payoutRatio = "";
     const paidUpCapital = "";
     const profit = yearlyProfit.get(1);
@@ -179,9 +163,6 @@ export default function AddRawStockDataForm(props) {
     formData.yearlyRevenue = yearlyRevenue;
 
     formData.currentDividendYield = currentDividendYield;
-    // formData.priceYoYGrowth = priceYoYGrowth;
-    // formData.profitYoYGrowth = profitYoYGrowth;
-    // formData.revenueYoYGrowth = revenueYoYGrowth;
 
     console.log("regiser value", register);
 
@@ -212,11 +193,6 @@ export default function AddRawStockDataForm(props) {
       severity: "error",
     }));
   }
-
-  // const handleOptionChange = (name) => (event, value) => {
-  //   console.log("name value", name, value);
-  //   setFormData({ ...formData, [name]: value });
-  // };
 
   const handleAddInput = () => {
     const newId = yearlyDividend.size + 1;
@@ -405,24 +381,6 @@ export default function AddRawStockDataForm(props) {
             />
           </Grid>
 
-          {/* <Grid item xs={12} sm={6}>
-            <TextField
-              id="formatted-numberformat-input"
-              variant="outlined"
-              fullWidth
-              className={classes.textField}
-              label="Purchase Price"
-              name="purchasePrice"
-              inputProps={{ type: "number" }}
-              onChange={handleInputChange}
-              {...register("purchasePrice", { required: true })}
-              error={errors.purchasePrice ? true : false}
-              helperText={
-                errors.purchasePrice?.type === "required" &&
-                "Symbol is required"
-              }
-            />
-          </Grid> */}
           <Grid item xs={12} sm={6}>
             <TextField
               id="bh"
@@ -444,49 +402,6 @@ export default function AddRawStockDataForm(props) {
               }
             />
           </Grid>
-
-          {/* <Grid item xs={12} sm={6}>
-            <TextField
-              id="formatted-numberformat-input"
-              variant="outlined"
-              fullWidth
-              className={classes.textField}
-              label="Profit"
-              name="profit"
-              inputProps={{ type: "number" }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={handleInputChange}
-              {...register("profit", { required: true })}
-              error={errors.profit ? true : false}
-              helperText={
-                errors.profit?.type === "required" && "Profit value is required"
-              }
-            />
-          </Grid> */}
-
-          {/* <Grid item xs={12} sm={6}>
-            <TextField
-              id="formatted-numberformat-input"
-              variant="outlined"
-              fullWidth
-              className={classes.textField}
-              label="Last year Profit(Q4)"
-              name="lastYearProfit"
-              inputProps={{ type: "number" }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={handleInputChange}
-              {...register("lastYearProfit", { required: true })}
-              error={errors.lastYearProfit ? true : false}
-              helperText={
-                errors.lastYearProfit?.type === "required" &&
-                "Last year Profit value is required"
-              }
-            />
-          </Grid> */}
 
           <Grid item xs={12} sm={6}>
             <TextField

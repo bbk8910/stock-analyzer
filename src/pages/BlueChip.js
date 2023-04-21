@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { getAllData, stockStore } from "../component/StockDao";
+import { getAllData, stockStore } from "../dao/StockDao";
 import StockTable from "../component/StockTable";
 
 export default function BlueChip(props) {
@@ -24,6 +24,7 @@ export default function BlueChip(props) {
       stockMap={stockMap}
       setFormData={setFormData}
       formData={formData}
+      action={false}
     />
   );
 }

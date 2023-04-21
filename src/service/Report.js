@@ -1,4 +1,4 @@
-import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "./Constant";
+import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "../constant/Constant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import { getPriceYOYGrowth, hasGrowth } from "./FundamentalCalculator";

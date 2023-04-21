@@ -12,7 +12,7 @@ import {
   getROEStatus,
   getStatusText,
   getUpDown,
-} from "./Report";
+} from "../service/Report";
 import {
   DataGrid,
   GridToolbarColumnsButton,
@@ -21,13 +21,13 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
-import { deleteData, stockStore } from "./StockDao";
+import { deleteData, stockStore } from "../dao/StockDao";
 import { Stack } from "@mui/material";
 import { StockDetail } from "./StockDetail";
-import { getCurrentDividendYield } from "./FundamentalCalculator";
+import { getCurrentDividendYield } from "../service/FundamentalCalculator";
 
 export default function StockTable(props) {
-  const { stockMap, setFormData, formData } = props;
+  const { stockMap, setFormData, formData, action } = props;
   const [dataList, setDataList] = React.useState([]);
 
   const [selectedIds, setSelectionModel] = React.useState([]);
@@ -127,17 +127,19 @@ export default function StockTable(props) {
             view
           </Button>
 
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            startIcon={<Edit />}
-            onClick={() => {
-              setFormData(params.row || {});
-            }}
-          >
-            Edit
-          </Button>
+          {action ? (
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              startIcon={<Edit />}
+              onClick={() => {
+                setFormData(params.row || {});
+              }}
+            >
+              Edit
+            </Button>
+          ) : null}
         </Stack>
       ),
     },

@@ -44,3 +44,15 @@ code {
 .btn-round {
   border-radius: 50% !important;
 }
+
+@media only screen and (max-width: 768px) {
+  .display-flex {
+    width: 100%;
+    display: block;
+  }
+
+  .page-wrapper {
+    display: block;
+    max-width: 100%;
+  }
+}

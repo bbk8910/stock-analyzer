@@ -16,18 +16,16 @@ export function StockDetail(props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
-        {"Use Google's location service?"}
-      </DialogTitle>
+      <DialogTitle id="alert-dialog-title">Stock Detail</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {console.log("")}
+          {JSON.stringify(detail)}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Disagree</Button>
         <Button onClick={handleClose} autoFocus>
-          Agree
+          Close
         </Button>
       </DialogActions>
     </Dialog>

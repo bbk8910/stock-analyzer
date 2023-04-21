@@ -63,8 +63,8 @@ export function calculateDividendYield(
   const currentYearDividendInPercent = Number(
     annualDividendPercentageList.get(1)
   );
-  const annualDividend = (currentYearDividendInPercent / 100) * marketPrice;
-  const dividendYield = (annualDividend / marketPrice) * 100;
+  const dividendYield = (currentYearDividendInPercent / marketPrice) * 100;
+  console.log("annual dividend", dividendYield);
   return dividendYield.toFixed(2);
 }
 
