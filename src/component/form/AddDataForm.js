@@ -200,12 +200,12 @@ export default function AddStockDataForm(props) {
   };
 
   return (
-    <Box className={classes.root}>
+    <Box sx={{ width: "100%" }}>
       <Typography variant="h4" component="h1" className={classes.title}>
         Add Stock Data
       </Typography>
       <form onSubmit={handleSubmit(save)}>
-        <Grid xs={12} container spacing={2}>
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Autocomplete
               disablePortal

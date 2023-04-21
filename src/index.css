@@ -55,4 +55,14 @@ code {
     display: block;
     max-width: 100%;
   }
+
+  .stock-form {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .stock-table {
+    width: 100%;
+    max-width: 100%;
+  }
 }

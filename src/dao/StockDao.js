@@ -1,11 +1,6 @@
-import {
-  CURRENT_TAB_KEY,
-  OVER_VLAUED,
-  UNDER_VALUED,
-} from "../constant/Constant";
+import { CURRENT_TAB_KEY, UNDER_VALUED } from "../constant/Constant";
 import {
   getCurrentDividendYieldStatus,
-  getEpsStatus,
   getGNPercentStatus,
   getPBStatus,
   getPEGStatus,
