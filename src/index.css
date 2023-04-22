@@ -44,6 +44,9 @@ code {
 .btn-round {
   border-radius: 50% !important;
 }
+.table-header {
+  background: #d3d3d370;
+}
 
 @media only screen and (max-width: 768px) {
   .display-flex {
