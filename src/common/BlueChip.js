@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { getAllData, stockStore } from "../dao/StockDao";
-import StockTable from "../component/StockTable";
+import StockTable from "./StockTable";
 
 export default function BlueChip(props) {
   const [stockMap, setStockMap] = React.useState([]);

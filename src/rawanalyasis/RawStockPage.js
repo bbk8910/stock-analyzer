@@ -1,8 +1,8 @@
 import { Box } from "@material-ui/core";
 import React, { useEffect } from "react";
-import AddStockForm from "../component/form/AddRawStockDataForm";
+import AddStockForm from "./AddRawStockDataForm";
 import { getAllData, getAllStock, stockStore } from "../dao/StockDao";
-import StockTable from "../component/StockTable";
+import StockTable from "../common/StockTable";
 
 export default function HomePage(prosp) {
   const [stockMap, setStockMap] = React.useState([]);
@@ -20,9 +20,13 @@ export default function HomePage(prosp) {
   }
 
   return (
-    <Box sx={{ width: "100%" }} className="page-wrapper">
+    <Box className="page-wrapper">
       <div className="stock-form">
-        <AddStockForm formData={formData} setFormData={setFormData} />
+        <AddStockForm
+          formData={formData}
+          onActionComplete={getStocksMap}
+          setFormData={setFormData}
+        />
       </div>
       <div className="stock-table">
         <StockTable

@@ -8,6 +8,7 @@ import {
   getPEGStatus,
   getPEStatus,
   getPriceGrowthStatus,
+  getRatioSummaryStatus,
   getROAStatus,
   getROEStatus,
   getStatusText,
@@ -106,6 +107,12 @@ export default function StockTable(props) {
       field: "revenueYoYGrowth",
       headerName: "RevenueYOYGrowth",
       renderCell: (params) => getUpDown(params.row.revenueYoYGrowth),
+    },
+
+    {
+      field: "ratioCount",
+      headerName: "Ratio Status",
+      renderCell: (params) => getRatioSummaryStatus(params.row.ratioCount),
     },
 
     {

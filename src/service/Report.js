@@ -2,6 +2,7 @@ import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "../constant/Constant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import { getPriceYOYGrowth, hasGrowth } from "./FundamentalCalculator";
+import Chip from "@mui/material/Chip";
 
 export const getStatusText = (obj) => {
   if (!obj) {
@@ -159,4 +160,15 @@ export function getCurrentDividendYieldStatus(value, sector) {
       ? { status: UNDER_VALUED, value: value }
       : { status: OVER_VLAUED, value: value };
   }
+}
+
+export function getRatioSummaryStatus(ratioCount) {
+  if (ratioCount <= 3) {
+    return <Chip label="Weak" color="error" />;
+  } else if (ratioCount > 3 && ratioCount < 5) {
+    return <Chip label="Medium" color="primary" />;
+  } else if (ratioCount >= 5) {
+    return <Chip label="Strong" color="success" />;
+  }
+  return "--";
 }

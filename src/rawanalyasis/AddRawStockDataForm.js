@@ -26,11 +26,11 @@ import {
   getPB,
   getPEG,
   getPERatio,
-} from "../../service/FundamentalCalculator.js";
-import { saveData, stockStore } from "../../dao/StockDao";
-import { SECTOR_LIST } from "../../constant/Constant.js";
-import { ServiceButton } from "../ServiceButton.js";
-import MySnackBar from "../SnackBar.js";
+} from "../service/FundamentalCalculator.js";
+import { saveData, stockStore } from "../dao/StockDao";
+import { SECTOR_LIST } from "../constant/Constant.js";
+import { ServiceButton } from "../component/ServiceButton.js";
+import MySnackBar from "../component/SnackBar.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddRawStockDataForm(props) {
-  const { formData, setFormData } = props;
+  const { formData, setFormData, onActionComplete } = props;
 
   const {
     register,
@@ -169,6 +169,7 @@ export default function AddRawStockDataForm(props) {
     saveData(formData, stockStore)
       .then(() => {
         handleSuccessSnackBar("Success");
+        onActionComplete();
       })
       .catch((error) => handleErrorSnackBar("Error Occurred"));
     setTimeout(() => {
@@ -596,7 +597,7 @@ export default function AddRawStockDataForm(props) {
             </IconButton>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Stack direction="row" spacing={1}>
               <ServiceButton
                 className={classes.button}

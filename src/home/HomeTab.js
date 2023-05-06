@@ -4,9 +4,9 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import HomePage from "./RawStockPage";
-import StockData from "./StockPage";
-import BlueChip from "./BlueChip";
+import HomePage from "../rawanalyasis/RawStockPage";
+import StockData from "../dataanalysis/StockPage";
+import BlueChip from "../common/BlueChip";
 import { getCurrentTab, saveTab } from "../dao/StockDao";
 
 function TabPanel(props) {
@@ -50,7 +50,7 @@ export default function HomeTab(props) {
   };
 
   return (
-    <Box sx={{ width: "100%" }} className="tab-wrapper">
+    <Box className="tab-wrapper">
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -59,7 +59,7 @@ export default function HomeTab(props) {
         >
           <Tab label="Raw Analysis" value={1} />
           <Tab label="Data Analysis" value={2} />
-          <Tab label="Blue Chips" value={3} />
+          <Tab label="Blue Chip" value={3} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={1}>

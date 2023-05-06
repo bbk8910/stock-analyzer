@@ -15,7 +15,7 @@ const DB_VERSION = 1;
 
 export const stockStore = "stockStore";
 
-const storeList = [stockStore, "hello"]; // List of stores to create
+const storeList = [stockStore]; // List of stores to create
 
 const getDB = () => {
   return new Promise((resolve, reject) => {
@@ -85,13 +85,12 @@ export async function saveData(object, storeName) {
 
   console.log("status list", statusList);
 
-  const underValuedCount = statusList.filter(
-    (data) => data === UNDER_VALUED
-  ).length;
-  console.log("under value count", underValuedCount);
+  const ratioCount = statusList.filter((data) => data === UNDER_VALUED).length;
+  console.log("under value count", ratioCount);
 
-  const isBlueChip = underValuedCount >= 5;
+  const isBlueChip = ratioCount >= 5;
   object.isBlueChip = isBlueChip;
+  object.ratioCount = ratioCount;
 
   if (objFromDb && objFromDb.id) {
     return updateData(storeName, object.id, object);
