@@ -16,8 +16,10 @@ import { useForm } from "react-hook-form";
 import AddCircleOutlineOutlined from "@material-ui/icons/AddCircleOutlineOutlined";
 import {
   calculateDividendYield,
+  calculateGrowthRate,
   getAnnualizedROA,
   getAnnualizedROE,
+  getAvgDividendYield,
   getBookValue,
   getDebtToEquity,
   getEps,
@@ -69,13 +71,11 @@ export default function AddRawStockDataForm(props) {
   const [loading, setLoading] = React.useState(false);
 
   const [yearlyDividend, setYearlyDividend] = React.useState(
-    new Map().set(1, "")
+    new Map().set(1, 0)
   );
 
-  const [yearlyProfit, setYearlyProfit] = React.useState(new Map().set(1, ""));
-  const [yearlyRevenue, setYearlyRevenue] = React.useState(
-    new Map().set(1, "")
-  );
+  const [yearlyProfit, setYearlyProfit] = React.useState(new Map().set(1, 0));
+  const [yearlyRevenue, setYearlyRevenue] = React.useState(new Map().set(1, 0));
   const [snackBarController, setSnackBarController] = React.useState({
     open: false,
     message: "",
@@ -95,18 +95,29 @@ export default function AddRawStockDataForm(props) {
 
   const save = (data) => {
     setLoading(true);
-    const bookValue = getBookValue(data.totalAssets, data.totalLiabilities);
-    const eps = getEps(data?.outstandingShare, data?.profit);
-    const pe = getPERatio(data.currentPrice, eps);
-    const epsGrowth =
-      eps - getEps(data.lastYearOutstandngShare, data.lastYearProfit);
+    const profit = yearlyProfit.get(1) || 0;
+    const lastYearProfit = yearlyProfit.get(2) || 0;
+    const currentPrice = data.currentPrice;
+    const lastYearPrice = data.lastYearPrice;
+    const lastYearOutstandngShare = data.lastYearOutstandngShare;
+
+    const bookValue = getBookValue(
+      data.totalAssets,
+      data.totalLiabilities,
+      data.outstandingShare
+    );
+    const eps = getEps(data?.outstandingShare, profit);
+    const pe = getPERatio(currentPrice, eps);
+
+    const pb = getPB(currentPrice, bookValue);
+    const roe = getAnnualizedROE(profit, data.outstandingShare);
+    const roa = getAnnualizedROA(profit, data.totalAssets);
+    const gn = getGN(eps, bookValue);
+
+    const lastYearEps = getEps(lastYearOutstandngShare, lastYearProfit);
+    const epsGrowth = calculateGrowthRate(lastYearEps, eps);
 
     const peg = getPEG(pe, epsGrowth);
-
-    const pb = getPB(data.currentPrice, bookValue);
-    const roe = getAnnualizedROE(data.profit, data.outstandingShare);
-    const roa = getAnnualizedROA(data.profit, data.totalAssets);
-    const gn = getGN(eps, bookValue);
     const gnAbove = getHigerThanGNInPercentage(
       eps,
       bookValue,
@@ -114,22 +125,13 @@ export default function AddRawStockDataForm(props) {
     );
 
     const debtToEquity = getDebtToEquity(data.totalDebt, data.outstandingShare);
-    const yearToYearGrowth =
-      ((data.currentPrice - data.lastPrice) / data.lastPrice) * 100;
+    const yearToYearGrowth = calculateGrowthRate(lastYearPrice);
 
-    const avgDividendYield = calculateDividendYield(
-      yearlyDividend,
-      data.currentPrice
-    );
+    const avgDividendYield = getAvgDividendYield(yearlyDividend, currentPrice);
     const currentDividendYield = calculateDividendYield(
-      yearlyDividend,
-      data.currentPrice
+      yearlyDividend.get(1),
+      currentPrice
     );
-
-    const payoutRatio = "";
-    const paidUpCapital = "";
-    const profit = yearlyProfit.get(1);
-    const lastYearProfit = yearlyProfit.get(2);
 
     formData.sector = data.sector;
     formData.id = data.id;
@@ -142,20 +144,16 @@ export default function AddRawStockDataForm(props) {
     formData.roa = roa;
     formData.gn = gn;
     formData.gnAbove = gnAbove;
-    formData.paidUpCapital = paidUpCapital;
     formData.debtToEquity = debtToEquity;
     formData.yearToYearGrowth = yearToYearGrowth;
-    formData.payoutRatio = payoutRatio;
     formData.outstandingShare = data.outstandingShare;
-    formData.lastYearOutstandngShare = data.lastYearOutstandngShare;
-    formData.profit = profit;
-    formData.lastYearProfit = lastYearProfit;
-    formData.currentPrice = data.currentPrice;
-    formData.lastYearPrice = data.lastYearPrice;
-    formData.mktCapitalization = data.mktCapitalization;
+    formData.lastYearOutstandngShare = lastYearOutstandngShare;
+    formData.currentPrice = currentPrice;
+    formData.lastYearPrice = lastYearPrice;
     formData.totalAssets = data.totalAssets;
     formData.totalLiabilities = data.totalLiabilities;
     formData.totalDebt = data.totalDebt;
+    formData.profit = profit;
 
     formData.avgDividendYield = avgDividendYield;
     formData.yearlyDividend = yearlyDividend;
@@ -164,7 +162,7 @@ export default function AddRawStockDataForm(props) {
 
     formData.currentDividendYield = currentDividendYield;
 
-    console.log("regiser value", register);
+    console.log("saved data", formData);
 
     saveData(formData, stockStore)
       .then(() => {
@@ -378,28 +376,6 @@ export default function AddRawStockDataForm(props) {
               helperText={
                 errors.lastYearPrice?.type === "required" &&
                 "Last year price is required"
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="bh"
-              variant="outlined"
-              fullWidth
-              className={classes.textField}
-              label="Market Capitalization"
-              name="mktCapitalization"
-              inputProps={{ type: "number" }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={handleInputChange}
-              {...register("mktCapitalization", { required: true })}
-              error={errors.mktCapitalization ? true : false}
-              helperText={
-                errors.mktCapitalization?.type === "required" &&
-                "This field is required"
               }
             />
           </Grid>

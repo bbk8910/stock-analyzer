@@ -5,7 +5,7 @@ import HomeTab from "./home/HomeTab";
 function AppRoutes(props) {
   return (
     <Switch>
-      <Route path="/" component={HomeTab} exact />
+      <Route path="/stock-analyzer" component={HomeTab} exact />
     </Switch>
   );
 }

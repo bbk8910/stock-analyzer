@@ -1,7 +1,7 @@
 import { OVER_VLAUED, sectorObj, UNDER_VALUED } from "../constant/Constant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import { getPriceYOYGrowth, hasGrowth } from "./FundamentalCalculator";
+import { getPriceYOYGrowth } from "./FundamentalCalculator";
 import Chip from "@mui/material/Chip";
 
 export const getStatusText = (obj) => {
@@ -28,6 +28,10 @@ export const getUpDown = (value) => {
     <TrendingDownIcon style={{ color: "red" }} />
   );
 };
+
+function hasGrowth(value) {
+  return value > 0;
+}
 
 export const getPriceGrowthStatus = (growth) => {
   if (!growth) {
@@ -88,7 +92,7 @@ export function getPEGStatus(peg) {
   if (!peg) {
     return getDefaultStatus();
   }
-  return peg <= 1
+  return peg < 1
     ? { status: UNDER_VALUED, value: peg }
     : { status: OVER_VLAUED, value: peg };
 }
@@ -139,27 +143,24 @@ export function getAvgDividendStatus(value, sector) {
   }
 }
 
-export function getAvgDividendYieldStatus(value, sector) {
-  if (!value) {
-    return getDefaultStatus();
-  }
-  if (sector === sectorObj.BANK) {
-    return value > 3.91
-      ? { status: UNDER_VALUED, value: value }
-      : { status: OVER_VLAUED, value: value };
-  } else if (sector == sectorObj.LIFE_INSURENCE) {
-  }
-}
-
 export function getCurrentDividendYieldStatus(value, sector) {
   if (!value) {
     return getDefaultStatus();
   }
-  if (sector === sectorObj.BANK) {
-    return value > 3.46
-      ? { status: UNDER_VALUED, value: value }
-      : { status: OVER_VLAUED, value: value };
+
+  return value > 3.46
+    ? { status: UNDER_VALUED, value: value }
+    : { status: OVER_VLAUED, value: value };
+}
+
+export function getAvgDividendYieldStatus(value, sector) {
+  if (!value) {
+    return getDefaultStatus();
   }
+
+  return value > 3.46
+    ? { status: UNDER_VALUED, value: value }
+    : { status: OVER_VLAUED, value: value };
 }
 
 export function getRatioSummaryStatus(ratioCount) {

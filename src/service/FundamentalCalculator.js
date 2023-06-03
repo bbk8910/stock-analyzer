@@ -1,5 +1,6 @@
-export function getBookValue(totalAssets, totalLibailities) {
-  return totalAssets - totalLibailities;
+export function getBookValue(totalAssets, totalLibailities, totalShare) {
+  let result = (totalAssets - totalLibailities) / totalShare;
+  return result.toFixed(2);
 }
 
 export function getEps(outstandingShare, profit) {
@@ -43,7 +44,8 @@ export function getDebtToEquity(totalDebt, totalEquity) {
 
 export function getHigerThanGNInPercentage(eps, bookValue, currentPrice) {
   const gn = getGN(eps, bookValue);
-  return ((currentPrice - gn) / gn) * 100;
+  let result = ((currentPrice - gn) / gn) * 100;
+  return result.toFixed(2);
 }
 
 export function getGN(eps, bookValue) {
@@ -51,67 +53,32 @@ export function getGN(eps, bookValue) {
 }
 
 export function getAvgDividendYield(history, currentPrice) {
-  let array = Array.from(history.values());
-  let avarageDividend = calculateMean(array);
-  return (avarageDividend / currentPrice) * 100;
+  console.log("before array", history);
+  let arrayValue = history.values();
+  let numArray = Array.from(arrayValue).map((num) => +num);
+  let avarageDividendInPercent = calculateMean(numArray);
+
+  let result = (avarageDividendInPercent / currentPrice) * 100;
+  return result.toFixed(2);
 }
 
 export function calculateDividendYield(
-  annualDividendPercentageList,
-  marketPrice
+  currentYearDevidendInPercent,
+  currentPrice
 ) {
-  const currentYearDividendInPercent = Number(
-    annualDividendPercentageList.get(1)
-  );
-  const dividendYield = (currentYearDividendInPercent / marketPrice) * 100;
+  console.log("ed--", currentYearDevidendInPercent, currentPrice);
+  const dividendYield = (currentYearDevidendInPercent / currentPrice) * 100;
   console.log("annual dividend", dividendYield);
   return dividendYield.toFixed(2);
 }
 
 export function getPriceYOYGrowth(lastYearPrice, currentPrice) {
-  let array = [lastYearPrice, currentPrice];
-  return calculateGrowthRate(array);
+  return calculateGrowthRate(lastYearPrice, currentPrice);
 }
 
-export function getProfitYOYGrowth(history, currentPrice) {
-  let array = Array.from(history.values());
-  return calculateGrowthRate(array);
-}
-
-export function getRevenueYOYGrwoth(history) {
-  let array = Array.from(history.values());
-  return calculateGrowthRate(array);
-}
-
-export function calculateGrowthRate(values) {
-  const yoyGrowthRates = [];
-  for (let i = 1; i < values.length; i++) {
-    const yoyGrowth = ((values[i] - values[i - 1]) / values[i - 1]) * 100;
-    yoyGrowthRates.push(yoyGrowth);
-  }
-  return yoyGrowthRates;
-}
-
-export function hasGrowth(yoyGrowthRates) {
-  let positiveGrowthCount = 0;
-  let negativeGrowthCount = 0;
-
-  for (let i = 0; i < yoyGrowthRates?.length; i++) {
-    if (yoyGrowthRates[i] > 0) {
-      console.log(`Year ${i + 1}: Positive growth of ${yoyGrowthRates[i]}%`);
-      positiveGrowthCount = positiveGrowthCount + 1;
-    } else if (yoyGrowthRates[i] < 0) {
-      negativeGrowthCount = negativeGrowthCount + 1;
-      console.log(`Year ${i + 1}: Negative growth of ${yoyGrowthRates[i]}%`);
-    } else {
-      console.log(`Year ${i + 1}: No growth`);
-    }
-  }
-
-  if (positiveGrowthCount > negativeGrowthCount) {
-    return true;
-  }
-  return false;
+export function calculateGrowthRate(prevValue, newValue) {
+  let result = ((newValue - prevValue) / prevValue) * 100;
+  return result.toFixed(2);
 }
 
 export function calculateMean(arr) {
@@ -119,7 +86,6 @@ export function calculateMean(arr) {
   for (let i = 0; i < arr.length; i++) {
     total += arr[i];
   }
+  console.log("total--mean", total);
   return total / arr.length;
 }
-
-//-----long term---------

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Paper, Box, Button, IconButton } from "@material-ui/core";
 import {
   getCurrentDividendYieldStatus,
@@ -25,13 +25,12 @@ import { DeleteForever, Edit, ViewAgenda } from "@material-ui/icons";
 import { deleteData, stockStore } from "../dao/StockDao";
 import { Stack } from "@mui/material";
 import { StockDetail } from "./StockDetail";
-import { getCurrentDividendYield } from "../service/FundamentalCalculator";
 
 export default function StockTable(props) {
   const { stockMap, setFormData, formData, action } = props;
-  const [dataList, setDataList] = React.useState([]);
+  const [dataList, setDataList] = useState([]);
 
-  const [selectedIds, setSelectionModel] = React.useState([]);
+  const [selectedIds, setSelectionModel] = useState([]);
 
   useEffect(() => {
     setDataList(Array.from(stockMap || []));
@@ -127,7 +126,7 @@ export default function StockTable(props) {
             color="primary"
             startIcon={<ViewAgenda />}
             onClick={() => {
-              setFormData(params.row || {});
+              setDetailView(params.row);
               handleClickOpen();
             }}
           >
@@ -174,7 +173,7 @@ export default function StockTable(props) {
     );
   }
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -183,6 +182,73 @@ export default function StockTable(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const labels = ["year 1", "year 2", "year 3", "year 4", "year 5"];
+  const [dividendData, setDividendData] = useState({});
+  const [profitData, setProfitData] = useState({});
+  const [revenueData, setRevenueData] = useState({});
+
+  function setDetailView(data) {
+    setFormData(data || {});
+    console.log("stock details--->", data);
+    const profitGrowthMap = new Map(data.yearlyProfit).values();
+    const profitGrowthArray = Array.from(profitGrowthMap)
+      ?.map(Number)
+      .reverse();
+
+    const revenueGrowthMap = new Map(data.yearlyRevenue).values();
+    const revenueGrowthArray = Array.from(revenueGrowthMap)
+      ?.map(Number)
+      .reverse();
+
+    const devidendGrowthMap = new Map(data.yearlyDividend).values();
+    const devidendGrowthArray = Array.from(devidendGrowthMap)
+      ?.map(Number)
+      .reverse();
+
+    setDividendData({
+      labels,
+      datasets: [
+        {
+          fill: true,
+          label: "Devidend Growth",
+          data: [...devidendGrowthArray],
+          borderColor: "rgb(53, 162, 235)",
+          backgroundColor: "rgba(53, 162, 235, 0.5)",
+        },
+      ],
+    });
+
+    setProfitData({
+      labels,
+      datasets: [
+        {
+          fill: true,
+          label: "Profit Growth",
+          data: profitGrowthArray,
+          borderColor: "rgb(53, 162, 235)",
+          backgroundColor: "rgba(53, 162, 235, 0.5)",
+        },
+      ],
+    });
+
+    setRevenueData({
+      labels,
+      datasets: [
+        {
+          fill: true,
+          label: "Revenue Growth",
+          data: revenueGrowthArray,
+          borderColor: "rgb(53, 162, 235)",
+          backgroundColor: "rgba(53, 162, 235, 0.5)",
+        },
+      ],
+    });
+
+    console.log("devidend growth", profitGrowthArray);
+    console.log("revenue growth", revenueData);
+    console.log("profit growth", profitData);
+  }
 
   return (
     <Box style={{ height: 600, width: "100%" }} component={Paper}>
@@ -199,7 +265,14 @@ export default function StockTable(props) {
           setSelectionModel(ids);
         }}
       />
-      <StockDetail open={open} handleClose={handleClose} detail={formData} />
+      <StockDetail
+        open={open}
+        handleClose={handleClose}
+        detail={formData}
+        dividendData={dividendData}
+        profitData={profitData}
+        revenueData={revenueData}
+      />
     </Box>
   );
 }
